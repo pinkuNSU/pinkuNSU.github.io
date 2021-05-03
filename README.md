@@ -1,0 +1,1 @@
+# pinkuNSU.github.io
