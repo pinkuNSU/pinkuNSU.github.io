@@ -37,7 +37,7 @@ function initiate(state, results) {
     };
 
     for (let i = 0; i < results.multiHandLandmarks.length; i++) {
-        if (results.multiHandedness[i].label == 'Right') {
+        if (results.multiHandedness[i].index == 1) {
             ret.right.dataID    = i;
             ret.right.area      = area(results.multiHandLandmarks[i]);
             ret.right.landmarks = results.multiHandLandmarks[i];
@@ -47,7 +47,7 @@ function initiate(state, results) {
                 return value;
             });
 
-        } else if (results.multiHandedness[i].label == 'Left') {
+        } else if (results.multiHandedness[i].index == 0) {
             ret.left.dataID     = i;
             ret.left.area       = area(results.multiHandLandmarks[i]);
             ret.left.landmarks  = results.multiHandLandmarks[i];

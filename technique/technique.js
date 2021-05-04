@@ -49,18 +49,19 @@ class Technique {
         // console.log("_setupSelection() btn:", btn);
 
         if (btn.row_i != -1 && btn.col_j != -1) {
-            if (btn.row_i != this.selection.previousBtn.row_i && 
+            if (btn.row_i != this.selection.previousBtn.row_i || 
                 btn.col_j != this.selection.previousBtn.col_j) {
                 
                 this.last_time_visited[btn.row_i][btn.col_j] = Date.now();
                 this.message = `Highlighted: ${(btn.row_i-1)*this.grid.input.divisions + btn.col_j}`;
                 this.visited_cell += 1;
-                this.selection.currentBtn.row_i = btn.row_i;
-                this.selection.currentBtn.col_j = btn.col_j;
                 
                 // console.log("changing highlight, tech:", this);
             }
-        }
+            
+            this.selection.currentBtn.row_i = btn.row_i;
+            this.selection.currentBtn.col_j = btn.col_j;
+        } 
     }
 
     _draw_main_grid_layout(state) {

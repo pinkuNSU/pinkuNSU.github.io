@@ -7,6 +7,9 @@ class S2HRelative {
     }
 
     calculate(state) {
+
+        if (!state.initData.left.show) return;
+
         let palm = state.palmRect();
         
         const w = Math.max(64, Math.min(400, palm.maxDim));
@@ -30,6 +33,7 @@ class S2HRelative {
     }
 
     draw(state) {
+        if (!state.initData.left.show) return;
 
         state.overlay = state.imageCV.clone();
         this.parent._draw_main_grid_layout(state);   

@@ -11,25 +11,52 @@ const CAMHEIGHT = 480;
 
 // previous code is here
 
+
+function remap(x, lo, hi, scale) {
+    return (x - lo) / (hi - lo + 1e-6) * scale;
+}
+
+function getMinMaxZ(landmarks) {
+    let zMax = Number.MIN_VALUE;
+    let zMin = Number.MAX_VALUE; 
+    landmarks.forEach(l => {
+        zMin = Math.min(zMin, l.z);
+        zMax = Math.max(zMax, l.z);
+    });
+
+    return {'zMin': zMin, 'zMax': zMax};
+}
+
+function getColorSizeValueFromZ(z, zMin, zMax, thicknessMin, thicknessMax) {
+    const color = 255 - remap(z, zMin, zMax, 255);
+    const scale = thicknessMax - thicknessMin;
+    const thickness = thicknessMin + (1.0 - remap(z, zMin, zMax, 1))*scale;
+    
+    return {
+        'color': Math.floor(color),
+        'thickness': Math.floor(thickness)
+    };
+}
+
+
 window.onload = function() {
 
-    navigator.getWebcam = (navigator.getUserMedia || navigator.webKitGetUserMedia || navigator.moxGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
-    if (navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({  audio: true, video: true })
-        .then(function (stream) {
-                    //Display the video stream in the video object
-        })
-        .catch(function (e) { logError(e.name + ": " + e.message); });
-    }
-    else {
-        navigator.getWebcam({ audio: true, video: true }, 
-            function (stream) {
-                    //Display the video stream in the video object
-            }, 
-            function () { logError("Web cam is not accessible."); });
-    }
+    // navigator.getWebcam = (navigator.getUserMedia || navigator.webKitGetUserMedia || navigator.moxGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
+    // if (navigator.mediaDevices.getUserMedia) {
+    //     navigator.mediaDevices.getUserMedia({  audio: true, video: true })
+    //     .then(function (stream) {
+    //                 //Display the video stream in the video object
+    //     })
+    //     .catch(function (e) { logError(e.name + ": " + e.message); });
+    // }
+    // else {
+    //     navigator.getWebcam({ audio: true, video: true }, 
+    //         function (stream) {
+    //                 //Display the video stream in the video object
+    //         }, 
+    //         function () { logError("Web cam is not accessible."); });
+    // }
 
-    console.log("window loaded");
     let state = getState();
 
     state.config = getConfig();
@@ -81,8 +108,8 @@ window.onload = function() {
         hands.setOptions({
             selfieMode: true,
             maxNumHands: 2,
-            minDetectionConfidence: 0.9,
-            minTrackingConfidence: 0.9
+            minDetectionConfidence: 0.8,
+            minTrackingConfidence: 0.8
         });
         
         hands.onResults(onResults);
@@ -128,6 +155,8 @@ window.onload = function() {
         state.imageCV = cv.imread('output_canvas');
         state.outputCV = state.imageCV.clone();
 
+        state.cursor = null;
+
         if (results.multiHandLandmarks && results.multiHandedness) {
             if (!done2) {
                 console.log("results:", results);
@@ -168,17 +197,23 @@ window.onload = function() {
         }
 
         if (state.cursor) {
-            state.cursor.z += 1;
+            
+            const rng = getMinMaxZ(state.initData.right.landmarks);
+            const colsz = getColorSizeValueFromZ(
+                state.cursor.z,
+                rng.zMin,
+                rng.zMax,
+                1,
+                10                
+            );
 
-            console.log("cursor:", state.cursor);
             cv.circle(
                 state.outputCV, 
                 new cv.Point(state.cursor.x, state.cursor.y), 
-                Math.min(20, state.cursor.z*10), 
-                new cv.Scalar(state.cursor.z*100, state.cursor.z*100, state.cursor.z*100), 
+                colsz.thickness, 
+                new cv.Scalar(colsz.color, colsz.color, colsz.color), 
                 -1);
         }
-
 
         cv.imshow('cv_output_canvas', state.outputCV);
 

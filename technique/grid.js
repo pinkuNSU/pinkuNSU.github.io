@@ -16,7 +16,9 @@ class Grid {
         
         this.dx_col = (this.width - (this.divisions+1)*this.gap) / this.divisions;
         this.dy_row = (this.height - (this.divisions+1)*this.gap) / this.divisions;
-        
+        this.dx_col_half = this.dx_col/2;
+        this.dy_row_half = this.dy_row/2;
+
         this.x_cols[0] = this.x;
         this.x_cols[1] = this.x_cols[0] + this.gap;
         for (var i = 2; i <= this.divisions; i ++) {
@@ -39,18 +41,24 @@ class Grid {
         
         if (cursor) {
             // cursor can be null if not found
-            for (var j = 1; j <= this.divisions; j ++) {
-                if (cursor.x >= this.x_cols[j] && cursor.x <= this.x_cols[j] + this.dx_col) {
-                    ret.col_j = j;
-                    break;
-                }
-            }
             
-            for (var i = 1; i <= this.divisions; i ++) {
-                if (cursor.y >= this.y_rows[i] && cursor.y <= this.y_rows[i] + this.dy_row) {
-                    ret.row_i = i;
+            if (cursor.x >= this.x_cols[0] && cursor.x <= this.x_cols[0]+this.width &&
+                cursor.y >= this.y_rows[0] && cursor.y <= this.y_rows[0]+this.height) {
+                    
+                    for (var j = 1; j <= this.divisions; j ++) {
+                        if (cursor.x >= this.x_cols[j] && (cursor.x <= this.x_cols[j] + this.dx_col)) {
+                            ret.col_j = j;
+                            break;
+                        }
+                    }
+                    
+                    for (var i = 1; i <= this.divisions; i ++) {
+                        if (cursor.y >= this.y_rows[i] && (cursor.y <= this.y_rows[i] + this.dy_row)) {
+                            ret.row_i = i;
+                            break;
+                        }
+                    }
                 }
-            }
         }
 
         return ret;
