@@ -2,6 +2,10 @@ import {checkRadio, checkSelectList, getState} from './state.js';
 import {initiate} from './initiator.js';
 import { getTechnique } from './technique/technique.js';
 import {getConfig} from './config.js';
+import {getTrigger} from './trigger/trigger.js';
+import {TRIGGER} from './trigger/triggerstate.js';
+import {ButtonSelection} from './ds/btnselection.js';
+
 
 let done = false;
 let done2 = false;
@@ -10,33 +14,6 @@ const CAMWIDTH = 640;
 const CAMHEIGHT = 480;
 
 // previous code is here
-
-
-function remap(x, lo, hi, scale) {
-    return (x - lo) / (hi - lo + 1e-6) * scale;
-}
-
-function getMinMaxZ(landmarks) {
-    let zMax = Number.MIN_VALUE;
-    let zMin = Number.MAX_VALUE; 
-    landmarks.forEach(l => {
-        zMin = Math.min(zMin, l.z);
-        zMax = Math.max(zMax, l.z);
-    });
-
-    return {'zMin': zMin, 'zMax': zMax};
-}
-
-function getColorSizeValueFromZ(z, zMin, zMax, thicknessMin, thicknessMax) {
-    const color = 255 - remap(z, zMin, zMax, 255);
-    const scale = thicknessMax - thicknessMin;
-    const thickness = thicknessMin + (1.0 - remap(z, zMin, zMax, 1))*scale;
-    
-    return {
-        'color': Math.floor(color),
-        'thickness': Math.floor(thickness)
-    };
-}
 
 
 window.onload = function() {
@@ -60,7 +37,13 @@ window.onload = function() {
     let state = getState();
 
     state.config = getConfig();
-    
+    state.selection = new ButtonSelection();
+
+    state.experiment = {
+        study1: {},
+        study2: {},
+    };
+
     let menuElement = document.getElementById("menu");
     
     let start_study = false;
@@ -71,11 +54,11 @@ window.onload = function() {
     // videoContainer.style.display = "none";
     
     const videoElement =
-    document.getElementById('input_video');
+        document.getElementById('input_video');
     videoElement.style.display = "none";
 
     const canvasElement =
-    document.getElementById('output_canvas');
+        document.getElementById('output_canvas');
 
     canvasElement.style.display = "none";
 
@@ -100,6 +83,7 @@ window.onload = function() {
         videoContainer.style.display = "block";
 
         state.technique = getTechnique(state);
+        state.trigger = getTrigger(state);
  
         const hands = new Hands({locateFile: (file) => {
             return `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.1/${file}`;
@@ -125,6 +109,7 @@ window.onload = function() {
         camera.start();
     }
     
+    startBtn.click(); // remove before prod
     
     // call tick() each time the graph runs.
     // const fpsControl = new FPS();
@@ -175,6 +160,30 @@ window.onload = function() {
             if (state.initData.show) {
 
                 state.technique.calculate(state);
+
+                state.trigger.update(state);
+
+                switch(state.trigger.status) {
+                    case TRIGGER.ONHOLD:
+                        console.log("switch TRIGGER.ONHOLD");
+                        break;
+                    case TRIGGER.OPEN:
+                        console.log("switch TRIGGER.OPEN");
+                        break;
+                    case TRIGGER.PRESSED:
+                        console.log("switch TRIGGER.PRESSED");
+                        break;
+                    case TRIGGER.RELEASED:
+                        console.log("switch TRIGGER.RELEASED");
+                        
+                        state.technique.markSelected(state);
+                        state.trigger.reset();
+                        break;
+                    default:
+                        state.trigger.reset();
+                        break;
+                }
+
                 state.technique.draw(state);
             }
             // for (let index = 0; index < results.multiHandLandmarks.length; index++) {
@@ -198,15 +207,8 @@ window.onload = function() {
 
         if (state.cursor) {
             
-            const rng = getMinMaxZ(state.initData.right.landmarks);
-            const colsz = getColorSizeValueFromZ(
-                state.cursor.z,
-                rng.zMin,
-                rng.zMax,
-                1,
-                10                
-            );
-
+            const colsz = state.initData.right.scale;
+            console.log("colsz:", colsz);
             cv.circle(
                 state.outputCV, 
                 new cv.Point(state.cursor.x, state.cursor.y), 

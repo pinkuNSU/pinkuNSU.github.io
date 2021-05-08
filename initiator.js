@@ -21,6 +21,33 @@ function area(landmarks) {
 }
 
 
+function remap(x, lo, hi, scale) {
+    return (x - lo) / (hi - lo + 1e-6) * scale;
+}
+
+function getMinMaxZ(landmarks) {
+    let zMax = Number.MIN_VALUE;
+    let zMin = Number.MAX_VALUE; 
+    landmarks.forEach(l => {
+        zMin = Math.min(zMin, l.z);
+        zMax = Math.max(zMax, l.z);
+    });
+
+    return {'zMin': zMin, 'zMax': zMax};
+}
+
+function getColorSizeValueFromZ(z, zMin, zMax, thicknessMin, thicknessMax) {
+    const color = 255 - remap(z, zMin, zMax, 255);
+    const scale = thicknessMax - thicknessMin;
+    const thickness = thicknessMin + (1.0 - remap(z, zMin, zMax, 1))*scale;
+    
+    return {
+        'color': Math.floor(color),
+        'thickness': Math.floor(thickness)
+    };
+}
+
+
 class HandInitData {
     constructor() {
         this.area = null,
@@ -47,6 +74,16 @@ function initiate(state, results) {
                 return value;
             });
 
+            const rng = getMinMaxZ(ret.right.landmarks);
+            
+            ret.right.scale = getColorSizeValueFromZ(
+                ret.right.landmarks[8].z,
+                rng.zMin,
+                rng.zMax,
+                1,
+                10                
+            );
+
         } else if (results.multiHandedness[i].index == 0) {
             ret.left.dataID     = i;
             ret.left.area       = area(results.multiHandLandmarks[i]);
@@ -57,6 +94,15 @@ function initiate(state, results) {
                 return value;
             });
             
+            const rng = getMinMaxZ(ret.left.landmarks);
+
+            ret.left.scale = getColorSizeValueFromZ(
+                ret.left.landmarks[8].z,
+                rng.zMin,
+                rng.zMax,
+                1,
+                10                
+            );
         }
     }
 

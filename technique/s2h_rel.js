@@ -38,7 +38,10 @@ class S2HRelative {
         state.overlay = state.imageCV.clone();
         this.parent._draw_main_grid_layout(state);   
         this.parent._drawCells(state);
-
+        this.parent._drawTextHighlighted(state);
+        this.parent._drawTextMarked(state);
+        this.parent._drawProgressBar(state);
+        
         cv.addWeighted(
             state.overlay, 
             state.config.TRANSPARENCY_ALPHA, 

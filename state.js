@@ -16,6 +16,11 @@ class State {
         this.initData = null;
         this.cursor = null;
         this.palmLandmarkIDs = [0, 1, 5, 9, 13, 17]; // TODO make it static
+        this.progressBar = {
+            size: -1,
+            maxWidth: 100,
+            maxHeight: 30
+        };
     }
 
     palmRect() {

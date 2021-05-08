@@ -5,7 +5,7 @@ class Grid {
         this.width = state.width/4;
         this.x = 0;
         this.y = 0;
-        this.gap = 5;
+        this.gap = 3;
         this.divisions = state.menu.cellscnt;
         this.x_cols = Array(11);
         this.y_rows = Array(11);
