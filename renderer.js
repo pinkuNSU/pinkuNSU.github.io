@@ -1,23 +1,22 @@
+"use strict";
+
 import {checkRadio, checkSelectList, getState} from './state.js';
-import {initiate} from './initiator.js';
-import { getTechnique } from './technique/technique.js';
-import {getConfig} from './config.js';
-import {getTrigger} from './trigger/trigger.js';
+import {Initiator} from './initiator.js';
+import { Technique } from './technique/technique.js';
+import {Config} from './config.js';
+import {Trigger} from './trigger/trigger.js';
 import {TRIGGER} from './trigger/triggerstate.js';
 import {ButtonSelection} from './ds/btnselection.js';
-
-
-let done = false;
-let done2 = false;
-
-const CAMWIDTH = 640;
-const CAMHEIGHT = 480;
+import { Trial } from './userstudies/trial.js';
+import {TrialState} from './userstudies/constant.js';
 
 // previous code is here
 
 
+
 window.onload = function() {
 
+    let firstTime = true;
     // navigator.getWebcam = (navigator.getUserMedia || navigator.webKitGetUserMedia || navigator.moxGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
     // if (navigator.mediaDevices.getUserMedia) {
     //     navigator.mediaDevices.getUserMedia({  audio: true, video: true })
@@ -36,7 +35,7 @@ window.onload = function() {
 
     let state = getState();
 
-    state.config = getConfig();
+    state.config = new Config();
     state.selection = new ButtonSelection();
 
     state.experiment = {
@@ -45,9 +44,7 @@ window.onload = function() {
     };
 
     let menuElement = document.getElementById("menu");
-    
-    let start_study = false;
-    
+
     // Our input frames will come from here.
     
     const videoContainer = document.getElementById("video_container");
@@ -64,7 +61,6 @@ window.onload = function() {
 
     const canvasCtx = canvasElement.getContext('2d');
     
-    
     const startBtn = document.getElementById("start_btn");
     startBtn.onclick = function() {
         state.menu.showMenu     = false;
@@ -75,16 +71,21 @@ window.onload = function() {
         state.menu.debug        = document.getElementById("debugCheck").checked;
         state.menu.cellscnt     = parseInt(checkSelectList("selectCells"));
         state.menu.targetscnt   = 3;
-        state.height            = CAMHEIGHT; 
-        state.width             = CAMWIDTH;
+        state.height            = state.config.CAMHEIGHT; 
+        state.width             = state.config.CAMWIDTH;
 
-        start_study = true;
         menu.style.display = "none";
         videoContainer.style.display = "block";
 
-        state.technique = getTechnique(state);
-        state.trigger = getTrigger(state);
- 
+        state.initiator = new Initiator(state);
+        state.technique = new Technique(state);
+        state.trigger = new Trigger(state);
+        
+        state.experiment.trial = new Trial(state);
+        state.experiment.prev_marked_i = -1;
+        state.experiment.prev_marked_j = -1;
+        state.experiment.trial.generateTarget(state);
+
         const hands = new Hands({locateFile: (file) => {
             return `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.1/${file}`;
         }});
@@ -92,8 +93,8 @@ window.onload = function() {
         hands.setOptions({
             selfieMode: true,
             maxNumHands: 2,
-            minDetectionConfidence: 0.8,
-            minTrackingConfidence: 0.8
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
         });
         
         hands.onResults(onResults);
@@ -102,27 +103,29 @@ window.onload = function() {
             onFrame: async () => {
                 await hands.send({image: videoElement});
             },
-            width: CAMWIDTH,
-            height: CAMHEIGHT
+            width: state.config.CAMWIDTH,
+            height: state.config.CAMHEIGHT
         });
 
         camera.start();
     }
     
-    startBtn.click(); // remove before prod
+    // startBtn.click(); // remove before prod
     
     // call tick() each time the graph runs.
     // const fpsControl = new FPS();
-    
 
+    function goBackToMenu() {
+        location.reload();
+        // menu.style.display = "block";
+        // videoContainer.style.display = "none";
+        // const mediaStream = videoElement.srcObject;
+        // const tracks = mediaStream.getTracks();
+        // tracks.forEach(track => track.stop())
+    }
     
     function onResults(results) {
-        // Hide the spinner.        
-        if (!done) {            
-            done = true;
-        }
-        
-        
+
         state.data = results;
         
         // document.body.classList.add('loaded');
@@ -136,56 +139,82 @@ window.onload = function() {
             results.image, 0, 0, canvasElement.width, canvasElement.height
         );
         
-        
         state.imageCV = cv.imread('output_canvas');
         state.outputCV = state.imageCV.clone();
 
+        state.initiator.initiate(state, results);
+        
         state.cursor = null;
+        state.cursor = (state.initiator.right.dataID != null)? state.initiator.right.landmarks[8]: null;
+        if (state.cursor == null) {
+            state.trigger.reset();
+        }
 
-        if (results.multiHandLandmarks && results.multiHandedness) {
-            if (!done2) {
-                console.log("results:", results);
-            }
+        if (state.initiator.show || state.technique.alwaysShow) {
+
+            state.technique.calculate(state);
             
-            state.initData = initiate(state, results);
-                
-            if (!done2) {
-                console.log("state.initData:", state);
-                console.log("typeof(results.image):", typeof(results.image));
-            }
-            
-            done2 = true;            
-            state.cursor = (state.initData.right.landmarks)? state.initData.right.landmarks[8]: null;
+            state.experiment.trial.updateStartBtnInputLoc(state);
 
-            if (state.initData.show) {
+            state.trigger.update(state);
 
-                state.technique.calculate(state);
-
-                state.trigger.update(state);
-
-                switch(state.trigger.status) {
-                    case TRIGGER.ONHOLD:
-                        console.log("switch TRIGGER.ONHOLD");
-                        break;
-                    case TRIGGER.OPEN:
-                        console.log("switch TRIGGER.OPEN");
-                        break;
-                    case TRIGGER.PRESSED:
-                        console.log("switch TRIGGER.PRESSED");
-                        break;
-                    case TRIGGER.RELEASED:
-                        console.log("switch TRIGGER.RELEASED");
-                        
+            // document.getElementById('stats').innerHTML = state.experiment.trial.targetsDuration;
+            switch(state.trigger.status) {
+                case TRIGGER.ONHOLD:
+                    // console.log("switch TRIGGER.ONHOLD");
+                    break;
+                case TRIGGER.OPEN:
+                    // console.log("switch TRIGGER.OPEN");
+                    break;
+                case TRIGGER.PRESSED:
+                    // console.log("switch TRIGGER.PRESSED");
+                    break;
+                case TRIGGER.RELEASED:
+                    // console.log("switch TRIGGER.RELEASED");
+                    if (state.experiment.trial.isCursorOverStartBtn(state)) {
+                        // console.log("RELASED over trial btn")
+                        state.experiment.trial.clickStartBtn(state);
+                    } else if(state.experiment.trial.isCursorOverBackBtn(state)) {
+                        console.log("RELEASED over back btn");
+                        goBackToMenu();
+                    } else if (state.experiment.trial.status == TrialState.STARTED){
                         state.technique.markSelected(state);
-                        state.trigger.reset();
-                        break;
-                    default:
-                        state.trigger.reset();
-                        break;
-                }
+                        
+                        if (state.experiment.trial.matched(state)) {
+                            state.experiment.trial.clickTarget(state);
+                            state.experiment.trial.generateTarget(state);
+                        }
+                    }
 
-                state.technique.draw(state);
+                    state.trigger.reset();
+                    break;
+                default:
+                    state.trigger.reset();
+                    break;
             }
+            
+            state.overlay = state.imageCV.clone();
+            
+            state.experiment.trial.drawStartBtn(state);
+            state.experiment.trial.drawBackBtn(state);
+            state.experiment.trial.drawCompletedTargetsText(state);
+
+            state.technique.draw(state);
+            
+            cv.addWeighted(
+                state.overlay, 
+                state.config.TRANSPARENCY_ALPHA, 
+                state.imageCV, 
+                1-state.config.TRANSPARENCY_ALPHA, 
+                0.0, 
+                state.outputCV, 
+                -1);
+                
+            state.experiment.trial.drawTarget(state);
+
+            state.overlay.delete();
+
+        }
             // for (let index = 0; index < results.multiHandLandmarks.length; index++) {
             //     const classification = results.multiHandedness[index];
             //     const isRightHand = classification.label === 'Right';
@@ -203,12 +232,11 @@ window.onload = function() {
             //             });
             //     }
             // }
-        }
+        // }
 
         if (state.cursor) {
             
-            const colsz = state.initData.right.scale;
-            console.log("colsz:", colsz);
+            const colsz = state.initiator.right.scale;
             cv.circle(
                 state.outputCV, 
                 new cv.Point(state.cursor.x, state.cursor.y), 

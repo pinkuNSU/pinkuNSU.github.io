@@ -27,9 +27,7 @@ class Dwell {
         
         this.selection.currentBtn.row_i = btn.row_i;
         this.selection.currentBtn.col_j = btn.col_j;
-        
-        console.log("dwell:", this, "state:", state);
-        
+                
         if (btn.row_i != -1 && btn.row_j != -1) {
             if (this.selection.previousBtn.row_i != -1 && 
                 this.selection.previousBtn.col_j != -1) {
@@ -72,22 +70,24 @@ class Dwell {
         }
 
 
-        if (state.experiment.isCursorOverTrialBtn) {
-            this.parent.status = TRIGGER.OPEN;
-            if (!this.trialBtnFocused) {
-                this.trialBtnFocused = true;
-                this.trialBtnTime = this.curTime;
-            }
+        if (state.experiment.trial.isCursorOverStartBtn(state) ||
+            state.experiment.trial.isCursorOverBackBtn(state)) {
+            
+                this.parent.status = TRIGGER.OPEN;
+                if (!this.trialBtnFocused) {
+                    this.trialBtnFocused = true;
+                    this.trialBtnTime = this.curTime;
+                }
 
-            let d = this.curTime - this.trialBtnTime;
-            if (d > state.config.DWELLWAIT_MS) {
-                this.parent.status = TRIGGER.RELEASED;
-                d = state.config.DWELLWAIT_MS;
-            } else if (2*d > state.config.DWELLWAIT_MS) {
-                this.parent.status = TRIGGER.PRESSED;
-            }
+                let d = this.curTime - this.trialBtnTime;
+                if (d > state.config.DWELLWAIT_MS) {
+                    this.parent.status = TRIGGER.RELEASED;
+                    d = state.config.DWELLWAIT_MS;
+                } else if (2*d > state.config.DWELLWAIT_MS) {
+                    this.parent.status = TRIGGER.PRESSED;
+                }
 
-            state.progressBar.size = d/state.config.DWELLWAIT_MS;
+                state.progressBar.size = d/state.config.DWELLWAIT_MS;
         } else {
             this.trialBtnFocused = false;
             this.trialBtnTime = this.curTime;
@@ -100,6 +100,10 @@ class Dwell {
                 this.visitTime[i][j] = ctime;
             }
         }
+    }
+
+    reset() {
+        
     }
 }
 

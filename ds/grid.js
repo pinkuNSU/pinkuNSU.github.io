@@ -9,7 +9,6 @@ class Grid {
         this.divisions = state.menu.cellscnt;
         this.x_cols = Array(11);
         this.y_rows = Array(11);
-        console.log("grid:", this);
     }
     
     align(state) {

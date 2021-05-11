@@ -20,15 +20,9 @@ class Trigger {
 
     reset() {
         this.status = TRIGGER.OPEN;
+        this.trigger.reset();
     }
 }
 
 
-function getTrigger(state) {
-    console.log("getTrigger state:", state);
-    return new Trigger(state);
-
-}
-
-
-export {getTrigger};
+export {Trigger};

@@ -13,7 +13,7 @@ class State {
         this.menu.cellscnt = null;
         this.menu.targetscnt = 3;
         this.data = null;
-        this.initData = null;
+        this.initiator = null;
         this.cursor = null;
         this.palmLandmarkIDs = [0, 1, 5, 9, 13, 17]; // TODO make it static
         this.progressBar = {
@@ -34,13 +34,13 @@ class State {
             maxDim: 0
         }
 
-        if (this.initData && this.initData.left.landmarks) {
-            ret.x = this.initData.left.landmarks[this.palmLandmarkIDs[0]].x;
-            ret.y = this.initData.left.landmarks[this.palmLandmarkIDs[0]].y;
+        if (this.initiator && this.initiator.left.landmarks) {
+            ret.x = this.initiator.left.landmarks[this.palmLandmarkIDs[0]].x;
+            ret.y = this.initiator.left.landmarks[this.palmLandmarkIDs[0]].y;
             
             for (var i = 1, len = this.palmLandmarkIDs.length; i < len; i ++) {
                 
-                const l = this.initData.left.landmarks[this.palmLandmarkIDs[i]];
+                const l = this.initiator.left.landmarks[this.palmLandmarkIDs[i]];
                 
                 ret.x = Math.min(ret.x, l.x);
                 ret.y = Math.min(ret.y, l.y);

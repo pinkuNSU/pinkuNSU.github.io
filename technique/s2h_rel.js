@@ -1,14 +1,15 @@
-
+import {TechniqueType} from "./constant.js";
 
 class S2HRelative {
-    constructor(parent) {
+    constructor(parent, state) {
         this.name = "S2H_Relative";
         this.parent = parent;
+        this.parent.type = TechniqueType.S2H_Relative;
     }
 
     calculate(state) {
 
-        if (!state.initData.left.show) return;
+        if (!state.initiator.left.show) return;
 
         let palm = state.palmRect();
         
@@ -24,34 +25,24 @@ class S2HRelative {
         this.parent.grid.output.x   = palm.x;
         this.parent.grid.output.y   = palm.y;
         
-        if (this.parent.grid.input.x > 0 && this.parent.grid.input.y > 0) {
-            this.parent.grid.input.align(state);
-            this.parent.grid.output.align(state);
+        if (this.parent.grid.input.x > 0 && 
+            this.parent.grid.input.y > 0) {
+            
+                this.parent.grid.input.align(state);
+                this.parent.grid.output.align(state);
 
-            this.parent._setupSelection(state);
+                this.parent._setupSelection(state);
         }
     }
 
     draw(state) {
-        if (!state.initData.left.show) return;
+        if (!state.initiator.left.show) return;
 
-        state.overlay = state.imageCV.clone();
         this.parent._draw_main_grid_layout(state);   
         this.parent._drawCells(state);
         this.parent._drawTextHighlighted(state);
         this.parent._drawTextMarked(state);
         this.parent._drawProgressBar(state);
-        
-        cv.addWeighted(
-            state.overlay, 
-            state.config.TRANSPARENCY_ALPHA, 
-            state.imageCV, 
-            1-state.config.TRANSPARENCY_ALPHA, 
-            0.0, 
-            state.outputCV, 
-            -1);
-        
-        state.overlay.delete();
     }
 }
 

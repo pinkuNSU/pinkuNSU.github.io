@@ -44,7 +44,7 @@
             
             <div class="form-group">
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="practiceCheck">
+                <input class="form-check-input" type="checkbox" id="practiceCheck" disabled>
                 <label class="form-check-label" for="practiceCheck">
                   Practice Mode
                 </label>
@@ -53,7 +53,7 @@
 
             <div class="form-group">
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="debugCheck">
+                <input class="form-check-input" type="checkbox" id="debugCheck" disabled>
                 <label class="form-check-label" for="debugCheck">
                   Debug Mode
                 </label>
@@ -85,20 +85,20 @@
                 </label>
               </div>
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="menutechnique" id="menutechnique_s2h_abs" value="S2H_Absolute">
+                <input class="form-check-input" type="radio" name="menutechnique" id="menutechnique_s2h_abs" value="S2H_Absolute" disabled>
                 <label class="form-check-label" for="menutechnique_s2h_abs">
                   S2H Absolute
                 </label>
               </div>
               
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="menutechnique" id="menutechnique_h2s_rel" value="H2S_Relative">
+                <input class="form-check-input" type="radio" name="menutechnique" id="menutechnique_h2s_rel" value="H2S_Relative" disabled>
                 <label class="form-check-label" for="menutechnique_h2s_rel">
                   H2S Relative
                 </label>
               </div>
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="menutechnique" id="menutechnique_h2s_abs" value="H2S_Absolute">
+                <input class="form-check-input" type="radio" name="menutechnique" id="menutechnique_h2s_abs" value="H2S_Absolute" disabled>
                 <label class="form-check-label" for="menutechnique_h2s_abs">
                   H2S Absolute
                 </label>
@@ -118,13 +118,13 @@
             <div class="row">
               <h2>Trigger</h2>
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="menutrigger" id="menutrigger_s2h_rel" checked value="Tap">
+                <input class="form-check-input" type="radio" name="menutrigger" id="menutrigger_s2h_rel" value="Tap">
                 <label class="form-check-label" for="menutrigger_s2h_rel">
                   Tap
                 </label>
               </div>
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="menutrigger" id="menutrigger_s2h_abs" value="Dwell">
+                <input class="form-check-input" type="radio" name="menutrigger" id="menutrigger_s2h_abs" value="Dwell" checked>
                 <label class="form-check-label" for="menutrigger_s2h_abs">
                   Dwell
                 </label>
@@ -147,6 +147,10 @@
           <canvas id="cv_output_canvas" width="640px" height="480px"></canvas>
           <canvas id="output_canvas" width="640px" height="480px"></canvas>
 
+        </div>
+
+        <div class="row" id="stats">
+          
         </div>
     </div>
 
