@@ -24,7 +24,7 @@ class Trial {
 
         this.targetID       = -1;
         this.targetSeqSize  = state.menu.targetscnt;
-
+        console.log("this.targetSeqSize:", this.targetSeqSize);
         this.targetsStartTime   = new Array(21);
         this.targetsEndTime     = new Array(21);
         this.targetsDuration    = new Array(21);

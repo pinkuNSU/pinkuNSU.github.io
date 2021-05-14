@@ -71,7 +71,7 @@ window.onload = function() {
         state.menu.practice     = document.getElementById("practiceCheck").checked; 
         state.menu.debug        = document.getElementById("debugCheck").checked;
         state.menu.cellscnt     = parseInt(checkSelectList("selectCells"));
-        state.menu.targetscnt   = 3;
+        state.menu.targetscnt   = 12;
         state.height            = state.config.CAMHEIGHT; 
         state.width             = state.config.CAMWIDTH;
 
