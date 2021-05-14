@@ -62,6 +62,16 @@ class Grid {
 
         return ret;
     }
+
+    isCursorInside(state) {
+        return (
+            state.cursor &&
+            this.x_cols[0] <= state.cursor.x + 10 &&
+            state.cursor.x <= this.x_cols[0] + this.width  + 10 &&
+            this.y_rows[0] <= state.cursor.y + 10 &&
+            state.cursor.y <= this.y_rows[0] + this.height + 10
+        );
+    }
 }
 
 export {Grid};

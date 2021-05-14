@@ -29,11 +29,20 @@ class Trial {
         this.targetsEndTime     = new Array(21);
         this.targetsDuration    = new Array(21);
         this.targetSeq          = new Array(21);
+
+        this.stats = {
+            attempts: (new Array(21)).fill(0)
+        }
+    }
+
+    incrementAttempts() {
+        this.stats.attempts[this.targetID] ++;
     }
 
     started() {
         return this.status == TrialState.STARTED;
     }
+
     isCursorOverStartBtn(state) {
         // console.log("isCursorOverBtn startBtn.rect:", this.startBtn.rect);
         
@@ -44,13 +53,13 @@ class Trial {
                 if (this.status != TrialState.STARTED &&
                     r.x <= state.cursor.x && state.cursor.x <= r.x + r.width + 50 &&
                     r.y <= state.cursor.y && state.cursor.y <= r.y + r.height + 50) {
+                        return true;
+                        // if (!this.cursorOverBtn) {
+                        //     this.cursorOverBtn = true;
+                        //     this.visitTimeBtn = performance.now();
+                        // }
     
-                        if (!this.cursorOverBtn) {
-                            this.cursorOverBtn = true;
-                            this.visitTimeBtn = performance.now();
-                        }
-    
-                        return (performance.now() - this.visitTimeBtn) > 5;
+                        // return (performance.now() - this.visitTimeBtn) > 5;
                     }
             }
         } 
@@ -68,14 +77,14 @@ class Trial {
                 if (this.status == TrialState.DONE &&
                     b.x <= state.cursor.x && state.cursor.x <= b.x + b.width &&
                     b.y <= state.cursor.y && state.cursor.y <= b.y + b.height) {
+                        return true;
+                        // if (!this.cursorOverBackBtn) {
+                        //     this.cursorOverBackBtn = true;
+                        //     this.visitTimeBackBtn = performance.now();
+                        // }
+                        // console.log("isCursorOverBackBtn backbtn:", b);
                         
-                        if (!this.cursorOverBackBtn) {
-                            this.cursorOverBackBtn = true;
-                            this.visitTimeBackBtn = performance.now();
-                        }
-                        console.log("isCursorOverBackBtn backbtn:", b);
-                        
-                        return (performance.now() - this.visitTimeBackBtn) > 5;
+                        // return (performance.now() - this.visitTimeBackBtn) > 5;
                     }
             }
         } 
@@ -164,9 +173,9 @@ class Trial {
         }
 
 
-        if (this.status == TrialState.STARTED) {
-            this.startBtn.color = new cv.Scalar(220, 248, 255);
-        }
+        // if (this.status == TrialState.STARTED) {
+        //     this.startBtn.color = new cv.Scalar(220, 248, 255);
+        // }
 
         if (this.status == TrialState.OPEN ||
             this.status == TrialState.PAUSED) {
@@ -245,6 +254,8 @@ class Trial {
         this.targetsEndTime[this.targetID] = performance.now();
         this.targetsDuration[this.targetID] =
             (this.targetsEndTime[this.targetID] - this.targetsStartTime[this.targetID]);
+    
+        this.status = TrialState.PAUSED;
     }
 
     drawTarget(state) {

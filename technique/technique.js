@@ -18,6 +18,10 @@ class Technique {
 
         this.name = state.menu.technique;
 
+        this.stats = {
+            visitedCells: 0
+        }
+
         console.log("tech name:", this.name);
         
         switch(this.name) {
@@ -33,7 +37,7 @@ class Technique {
                 break;
         }
     }
-
+    
     calculate(state) {
         this.anchor.calculate(state);
     }
@@ -42,7 +46,19 @@ class Technique {
         this.anchor.draw(state);        
     }
 
+    resetLastTimeVisited() {
+        const t = performance.now();
+        for (let i = 0; i < 11; i ++) {
+            for (let j = 0; j < 11; j ++) {
+                this.last_time_visited[i][j] = t;
+            }
+        }
+    }
+
     _setupSelection(state) {
+
+        if (state.selection.locked) return;
+
         state.selection.previousBtn.row_i = 
             state.selection.currentBtn.row_i;
         state.selection.previousBtn.col_j = 
@@ -66,6 +82,8 @@ class Technique {
             
             state.selection.currentBtn.row_i = btn.row_i;
             state.selection.currentBtn.col_j = btn.col_j;
+
+            state.selection.addToPastSelections(btn);
         } 
     }
 
@@ -105,22 +123,22 @@ class Technique {
             }
         }
 
-        if (state.selection.currentBtn.row_i != -1 &&
-            state.selection.currentBtn.col_j != -1) {
+        // if (state.selection.currentBtn.row_i != -1 &&
+        //     state.selection.currentBtn.col_j != -1) {
 
-            let c = new cv.Scalar(25, 25, 255);
-            cv.rectangle(
-                state.overlay,
-                new cv.Point(
-                    this.grid.output.x_cols[state.selection.currentBtn.col_j], 
-                    this.grid.output.y_rows[state.selection.currentBtn.row_i]),
-                new cv.Point(
-                    this.grid.output.x_cols[state.selection.currentBtn.col_j]+this.grid.output.dx_col, 
-                    this.grid.output.y_rows[state.selection.currentBtn.row_i] + this.grid.output.dy_row),
-                c,
-                -1
-            );
-        }
+        //     let c = new cv.Scalar(25, 25, 255);
+        //     cv.rectangle(
+        //         state.overlay,
+        //         new cv.Point(
+        //             this.grid.output.x_cols[state.selection.currentBtn.col_j], 
+        //             this.grid.output.y_rows[state.selection.currentBtn.row_i]),
+        //         new cv.Point(
+        //             this.grid.output.x_cols[state.selection.currentBtn.col_j]+this.grid.output.dx_col, 
+        //             this.grid.output.y_rows[state.selection.currentBtn.row_i] + this.grid.output.dy_row),
+        //         c,
+        //         -1
+        //     );
+        // }
     }
 
     markSelected(state) {

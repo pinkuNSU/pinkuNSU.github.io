@@ -18,8 +18,10 @@ class Trigger {
         this.trigger.update(state);
     } 
 
-    reset() {
+    reset(state) {
+        state.selection.locked = false;
         this.status = TRIGGER.OPEN;
+        state.resetCursorPath();
         this.trigger.reset();
     }
 }
