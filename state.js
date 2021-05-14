@@ -13,7 +13,7 @@ class State {
         this.menu.practice = false;
         this.menu.debug = false;
         this.menu.cellscnt = null;
-        this.menu.targetscnt = 3;
+        this.menu.targetscnt = 12;
         this.data = null;
         this.initiator = null;
         this.cursor = null;
