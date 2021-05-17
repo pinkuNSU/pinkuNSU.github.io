@@ -10,6 +10,13 @@ class Grid {
         this.x_cols = Array(11);
         this.y_rows = Array(11);
     }
+
+    getBottomMiddle() {
+        return {
+            x: this.x + this.width/2,
+            y: this.y + this.height
+        };
+    }
     
     align(state) {
         

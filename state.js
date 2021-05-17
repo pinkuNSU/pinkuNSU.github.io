@@ -39,6 +39,8 @@ class State {
 
         // console.log("updateCursorPath this.cursorPath:", this.cursorPath);
         // return;
+        if (!this.cursor) return;
+
         if (this.cursorPath.tail == null) {
             this.cursorPath.tail = new Point(this.cursor.x, this.cursor.y);
             this.cursorPath.head = this.cursorPath.tail;

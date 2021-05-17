@@ -1,7 +1,10 @@
 import {S2HRelative} from './s2h_rel.js';
+import {S2HAbsolute} from './s2h_abs.js';
+import {H2SRelative} from './h2s_rel.js';
+import { MidAir }    from './midair.js';
+
 import {Grid} from '../ds/grid.js';
 import { TechniqueType } from './constant.js';
-import { MidAir } from './midair.js';
 
 
 
@@ -20,7 +23,23 @@ class Technique {
 
         this.stats = {
             visitedCells: 0
-        }
+        };
+
+        this.images = {
+            palm: {
+                image: null,
+                mask: null,
+                topleft: {
+                    x: -1,
+                    y: -1
+                },
+                width: -1,
+                height: -1
+            },
+            background: {
+                image: null
+            }
+        };
 
         console.log("tech name:", this.name);
         
@@ -28,6 +47,14 @@ class Technique {
             case "S2H_Relative":
                 console.log("S2H_Relative enterered");
                 this.anchor = new S2HRelative(this, state);
+                break;
+            case "S2H_Absolute":
+                console.log("S2H_Absolute enterered");
+                this.anchor = new S2HAbsolute(this, state);
+                break;
+            case "H2S_Relative":
+                console.log("H2S_Relative enterered");
+                this.anchor = new H2SRelative(this, state);
                 break;
             case "MidAir":
                 console.log("MidAir enterered");
@@ -53,6 +80,53 @@ class Technique {
                 this.last_time_visited[i][j] = t;
             }
         }
+    }
+
+    _setupPalmImageTopLeft(state) {
+        const g = this.grid.input.getBottomMiddle();
+        
+        if (g.x != -1 && g.y != -1) {
+            this.images.palm.topleft.x = g.x - this.images.palm.image.cols/2;
+            this.images.palm.topleft.y = g.y - this.images.palm.image.rows;
+            
+            if (this.images.palm.topleft.x < 0) this.images.palm.topleft.x = 0;
+            if (this.images.palm.topleft.y < 0) this.images.palm.topleft.y = 0;
+
+            if (this.width < this.images.palm.topleft.x + this.images.palm.image.cols) 
+                this.images.palm.topleft.x = this.width - this.images.palm.image.cols;
+            
+            if (this.height < this.images.palm.topleft.y + this.images.palm.image.rows) 
+                this.images.palm.topleft.y = this.height - this.images.palm.image.rows;
+        }
+    }
+
+    _setupPalmImage(width, height) {
+        this.images.palm.width = width;
+        this.images.palm.height = height;
+        this.images.palm.image = cv.imread('imgpalm', cv.CV_LOAD_UNCHANGED);
+        cv.flip(this.images.palm.image, this.images.palm.image, 1);
+
+        if (this.images.palm.image.channels() < 4) {
+            console.error("less than 4 channels");
+            return;
+        }
+
+        cv.resize(this.images.palm.image, this.images.palm.image, new cv.Size(width, height));
+
+        let rgbaPlanes = new cv.MatVector();
+        cv.split(this.images.palm.image, rgbaPlanes);
+        this.images.palm.mask = rgbaPlanes.get(3);
+        cv.merge(rgbaPlanes, this.images.palm.image);
+        rgbaPlanes.delete();
+    }
+
+    _setupBackground(state) {
+        this.images.background.image = cv.imread('imgbackground', cv.CV_LOAD_UNCHANGED);
+        cv.resize(
+            this.images.background.image, 
+            this.images.background.image, 
+            new cv.Size(state.width, state.height)
+        );
     }
 
     _setupSelection(state) {

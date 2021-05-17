@@ -7,14 +7,13 @@ import {Trigger} from './trigger/trigger.js';
 import {TRIGGER} from './trigger/triggerstate.js';
 import { Trial } from './userstudies/trial.js';
 import {TrialState} from './userstudies/constant.js';
+import {TechniqueType} from "./technique/constant.js";
 
 // previous code is here
 
 
 
 window.onload = function() {
-
-    let firstTime = true;
     // navigator.getWebcam = (navigator.getUserMedia || navigator.webKitGetUserMedia || navigator.moxGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
     // if (navigator.mediaDevices.getUserMedia) {
     //     navigator.mediaDevices.getUserMedia({  audio: true, video: true })
@@ -140,9 +139,19 @@ window.onload = function() {
             results.image, 0, 0, canvasElement.width, canvasElement.height
         );
         
-        state.imageCV = cv.imread('output_canvas');
-        state.outputCV = state.imageCV.clone();
+        
+        if (state.technique.type == TechniqueType.S2H_Relative) {
+            state.imageCV = state.technique.images.background.image.clone();            
+            state.outputCV = state.technique.images.background.image.clone();
+        } else {
+            
+            state.imageCV = cv.imread('output_canvas');
+            state.outputCV = state.imageCV.clone();
+        }
 
+        // console.log("state.imageCV.channels():", state.imageCV.channels());
+        // console.log("state.outputCV.channels():", state.outputCV.channels());
+        // console.log("state.technique.images.palm.image.channels():", state.technique.images.palm.image.channels());
         state.initiator.initiate(state, results);
         
         state.cursor = (state.initiator.right.dataID != null)? state.initiator.right.landmarks[8]: null;
@@ -216,14 +225,24 @@ window.onload = function() {
                 state.selection.reset();
                 state.technique.resetLastTimeVisited();
             }
-
-            state.overlay = state.imageCV.clone();
             
+            // if (state.technique.type == TechniqueType.S2H_Relative) {
+            //     state.overlay = new cv.Mat(
+            //         state.imageCV.rows,
+            //         state.imageCV.cols,
+            //         cv.CV_8UC4,
+            //         new cv.Scalar(0, 0, 0)
+            //     );
+            // } else {
+            state.overlay = state.imageCV.clone();
+                // console.log("state.overlay.channels():", state.overlay.channels());
+            // }
+            
+            state.technique.draw(state);
             state.experiment.trial.drawStartBtn(state);
             state.experiment.trial.drawBackBtn(state);
             state.experiment.trial.drawCompletedTargetsText(state);
 
-            state.technique.draw(state);
             
             cv.addWeighted(
                 state.overlay, 
