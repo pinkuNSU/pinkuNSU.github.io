@@ -26,7 +26,7 @@ class State {
 
         this.config = new Config();
         this.selection = new ButtonSelection();
-        
+  
         this.cursorPath = {
             show: false,
             head: null,
@@ -102,6 +102,13 @@ class State {
         }
 
         return ret;
+    }
+
+    palmbase() {
+        if (this.initiator == null ||
+            this.initiator.left == null)
+                return null;
+        return this.initiator.left.landmarks[0];
     }
 }
 

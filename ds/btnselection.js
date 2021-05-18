@@ -1,6 +1,3 @@
-
-
-
 class Button {
     constructor() {
         this.row_i = -1;

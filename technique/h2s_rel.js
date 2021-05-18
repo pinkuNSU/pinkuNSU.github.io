@@ -2,12 +2,11 @@ import {TechniqueType} from "./constant.js";
 
 class H2SRelative {
     constructor(parent, state) {
-        this.name = "S2H_Relative";
+        this.name = "H2S_Relative";
         this.parent = parent;
-        this.parent.type = TechniqueType.S2H_Relative;
+        this.parent.type = TechniqueType.H2S_Relative;
         this.parent._setupPalmImage(250, 250);
         this.parent._setupBackground(state);
-        console.log("h2srel palmimage:", this.parent.imagePalm);
     }
 
     calculate(state) {

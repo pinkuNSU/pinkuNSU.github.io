@@ -14,6 +14,16 @@ import {TechniqueType} from "./technique/constant.js";
 
 
 window.onload = function() {
+
+    const userIDElement = document.getElementById('selectUserID');
+    
+    for (let i = 1; i < 101; i ++) {
+        var opt = document.createElement('option');
+        opt.appendChild( document.createTextNode(i) );
+        opt.value = i; 
+        userIDElement.appendChild(opt);
+    }
+
     // navigator.getWebcam = (navigator.getUserMedia || navigator.webKitGetUserMedia || navigator.moxGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
     // if (navigator.mediaDevices.getUserMedia) {
     //     navigator.mediaDevices.getUserMedia({  audio: true, video: true })
@@ -66,7 +76,7 @@ window.onload = function() {
         state.menu.showMenu     = false;
         state.menu.technique    = checkRadio("menutechnique");
         state.menu.trigger      = checkRadio("menutrigger");
-        state.menu.userID       = document.getElementById("inputUserID").value;
+        state.menu.userID       = parseInt(checkSelectList("selectUserID"));
         state.menu.practice     = document.getElementById("practiceCheck").checked; 
         state.menu.debug        = document.getElementById("debugCheck").checked;
         state.menu.cellscnt     = parseInt(checkSelectList("selectCells"));
@@ -140,18 +150,15 @@ window.onload = function() {
         );
         
         
-        if (state.technique.type == TechniqueType.S2H_Relative) {
+        if (state.technique.type == TechniqueType.H2S_Relative ||
+            state.technique.type == TechniqueType.H2S_Absolute) {
             state.imageCV = state.technique.images.background.image.clone();            
             state.outputCV = state.technique.images.background.image.clone();
         } else {
-            
             state.imageCV = cv.imread('output_canvas');
             state.outputCV = state.imageCV.clone();
         }
 
-        // console.log("state.imageCV.channels():", state.imageCV.channels());
-        // console.log("state.outputCV.channels():", state.outputCV.channels());
-        // console.log("state.technique.images.palm.image.channels():", state.technique.images.palm.image.channels());
         state.initiator.initiate(state, results);
         
         state.cursor = (state.initiator.right.dataID != null)? state.initiator.right.landmarks[8]: null;
@@ -193,9 +200,9 @@ window.onload = function() {
                     break;
                 case TRIGGER.RELEASED:
                     state.resetCursorPath();
-                    console.log("switch TRIGGER.RELEASED");
+                    // console.log("switch TRIGGER.RELEASED");
                     if (state.experiment.trial.isCursorOverStartBtn(state)) {
-                        console.log("RELASED over trial btn");
+                        // console.log("RELASED over trial btn")
                         state.experiment.trial.clickStartBtn(state);
                         state.technique.stats.visitedCells = 0;
                         resetAnchor = true;
@@ -226,17 +233,7 @@ window.onload = function() {
                 state.technique.resetLastTimeVisited();
             }
             
-            // if (state.technique.type == TechniqueType.S2H_Relative) {
-            //     state.overlay = new cv.Mat(
-            //         state.imageCV.rows,
-            //         state.imageCV.cols,
-            //         cv.CV_8UC4,
-            //         new cv.Scalar(0, 0, 0)
-            //     );
-            // } else {
             state.overlay = state.imageCV.clone();
-                // console.log("state.overlay.channels():", state.overlay.channels());
-            // }
             
             state.technique.draw(state);
             state.experiment.trial.drawStartBtn(state);
@@ -326,6 +323,18 @@ window.onload = function() {
             }
 
             canvasCVOutCtx.stroke();
+        }
+
+        if (state.technique.type == TechniqueType.H2S_Absolute && state.technique.inputBound && state.technique.inputBound) {
+            canvasCVOutCtx.strokeStyle = "white";
+            canvasCVOutCtx.lineWidth = 3;
+            canvasCVOutCtx.globalAlpha = 0.4;
+            canvasCVOutCtx.strokeRect(
+                state.technique.inputBound.topleft.x, 
+                state.technique.inputBound.topleft.y, 
+                state.technique.inputBound.bottomright.x - state.technique.inputBound.topleft.x,
+                state.technique.inputBound.bottomright.y - state.technique.inputBound.topleft.y
+            );
         }
 
         if (state.outputCV) {

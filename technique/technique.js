@@ -5,7 +5,7 @@ import { MidAir }    from './midair.js';
 
 import {Grid} from '../ds/grid.js';
 import { TechniqueType } from './constant.js';
-
+import { H2SAbsolute } from './h2s_abs.js';
 
 
 class Technique {
@@ -45,19 +45,18 @@ class Technique {
         
         switch(this.name) {
             case "S2H_Relative":
-                console.log("S2H_Relative enterered");
                 this.anchor = new S2HRelative(this, state);
                 break;
             case "S2H_Absolute":
-                console.log("S2H_Absolute enterered");
                 this.anchor = new S2HAbsolute(this, state);
                 break;
             case "H2S_Relative":
-                console.log("H2S_Relative enterered");
                 this.anchor = new H2SRelative(this, state);
                 break;
+            case "H2S_Absolute":
+                this.anchor = new H2SAbsolute(this, state);
+                break;
             case "MidAir":
-                console.log("MidAir enterered");
                 this.anchor = new MidAir(this, state);
                 break;
             default:
@@ -79,6 +78,24 @@ class Technique {
             for (let j = 0; j < 11; j ++) {
                 this.last_time_visited[i][j] = t;
             }
+        }
+    }
+
+    _setupPalmActiveZone(state) {
+        const g = state.palmbase();
+
+        if (g) {
+            this.images.palm.topleft.x = g.x - this.images.palm.image.cols/2;
+            this.images.palm.topleft.y = g.y - this.images.palm.image.rows;
+            
+            if (this.images.palm.topleft.x < 0) this.images.palm.topleft.x = 0;
+            if (this.images.palm.topleft.y < 0) this.images.palm.topleft.y = 0;
+
+            if (this.width < this.images.palm.topleft.x + this.images.palm.image.cols) 
+                this.images.palm.topleft.x = this.width - this.images.palm.image.cols;
+        
+            if (this.height < this.images.palm.topleft.y + this.images.palm.image.rows) 
+                this.images.palm.topleft.y = this.height - this.images.palm.image.rows;
         }
     }
 
