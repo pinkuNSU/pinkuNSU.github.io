@@ -46,7 +46,7 @@
             
             <div class="form-group">
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="practiceCheck" disabled>
+                <input class="form-check-input" type="checkbox" id="practiceCheck">
                 <label class="form-check-label" for="practiceCheck">
                   Practice Mode
                 </label>
@@ -66,17 +66,16 @@
             <div class="form-group">
               <label class="mr-sm-2" for="selectCells">Number of cells per row/col</label>
               <select class="custom-select mr-sm-2" id="selectCells">
-                <option selected>4</option>
                 <option value="2">2</option>
-                <option value="4">4</option>
+                <option value="4" selected>4</option>
                 <option value="6">6</option>
               </select>
             </div>
           </div>
 
-          <div class="col-md-2"></div>
+          <!-- <div class="col-md-2"></div> -->
         
-          <div class="col">
+          <div class="col-md-3">
             <div class="row">
               <h2>Technique</h2>
 
@@ -116,7 +115,7 @@
 
             
           </div>
-          <div class="col">
+          <div class="col-md-3">
             <div class="row">
               <h2>Trigger</h2>
               <div class="form-check">
@@ -136,15 +135,16 @@
           </div>
         </div>
         <div class="row">
-          <div class="col"></div>
-          <div class="col"></div>
-          <div class="col">
-            <button type="button" class="btn btn-success" id="start_btn">Start</button>
+          <div class="col-md-3"></div>
+          <div class="col-md-3 no-padding">
+            <button type="button" class="btn btn-success full-width" id="start_btn">Start</button>
+          </div>
+          <div class="col-md-3">
           </div>
         </div>
       </form>
 
-      <div class="row" id="video_container" width="640px" height="480px">
+      <div class="row fixed-size" id="video_container" width="640px" height="480px">
           <video id="input_video"></video>
           <canvas id="cv_output_canvas" width="640px" height="480px"></canvas>
           <canvas id="output_canvas" width="640px" height="480px"></canvas>

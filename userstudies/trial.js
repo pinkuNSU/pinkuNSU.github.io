@@ -125,7 +125,7 @@ class Trial {
             cv.rectangle(
                 state.overlay,
                 new cv.Point(this.backBtn.rect.x, this.backBtn.rect.y),
-                new cv.Point(this.backBtn.rect.x + this.backBtn.rect.width, this.backBtn.rect.y + this.backBtn.rect.height),
+                new cv.Point(this.backBtn.rect.x + this.backBtn.rect.width/2, this.backBtn.rect.y + this.backBtn.rect.height),
                 this.backBtn.color,
                 -1
             );
@@ -138,7 +138,7 @@ class Trial {
                     this.backBtn.rect.y + this.backBtn.rect.height/2 + 5
                 ),
                 cv.FONT_HERSHEY_SIMPLEX,
-                0.5,
+                0.3,
                 new cv.Scalar(225, 225, 225),
                 2
             );
@@ -152,23 +152,23 @@ class Trial {
 
         let tl = new cv.Point(
             state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10,
-            state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 - 25
+            state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 - 20
         );
 
         let br = new cv.Point(
-            state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10 + 70,
-            state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 + 25
+            state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10 + 35,
+            state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 + 20
         );
 
         if (state.technique.type == TechniqueType.H2S_Absolute) {
             tl = new cv.Point(
                 state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10,
-                state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 - 25
+                state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 - 20
             );
 
             br = new cv.Point(
-                state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10 + 70,
-                state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 + 25    
+                state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10 + 35,
+                state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 + 20    
             );
         }
 
@@ -191,9 +191,9 @@ class Trial {
                 cv.putText(
                     state.overlay,
                     this.startBtn.label,
-                    new cv.Point(-30 + (tl.x + br.x)/2, (tl.y + br.y + 10)/2),
+                    new cv.Point(-15 + (tl.x + br.x)/2, (tl.y + br.y + 10)/2),
                     cv.FONT_HERSHEY_SIMPLEX,
-                    0.5,
+                    0.4,
                     new cv.Scalar(225, 225, 225),
                     2
                 );
