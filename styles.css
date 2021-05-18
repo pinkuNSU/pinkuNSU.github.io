@@ -24,8 +24,8 @@ div .no-padding {
   width: 80%; }
 
 div .fixed-size {
-  width: 640px;
+  width: 1080px;
   /* or whatever width you want. */
-  max-width: 480px;
+  max-width: 720px;
   /* or whatever width you want. */
   display: inline-block; }
