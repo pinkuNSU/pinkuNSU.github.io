@@ -61,7 +61,8 @@ window.onload = function() {
 
     const canvasElement =
         document.getElementById('output_canvas');
-
+    // canvasElement.style.width = state.config.CAMWIDTH + "px";
+    // canvasElement.style.height = state.config.CAMHEIGHT + "px";
     canvasElement.style.display = "none";
 
     const canvasCtx = canvasElement.getContext('2d');
@@ -69,8 +70,11 @@ window.onload = function() {
 
     const canvasCVOut = 
         document.getElementById('cv_output_canvas');
-    const canvasCVOutCtx = canvasCVOut.getContext('2d');
+    canvasCVOut.style.width = state.config.CAMWIDTH + "px";
+    canvasCVOut.style.height = state.config.CAMHEIGHT + "px";
     
+    const canvasCVOutCtx = canvasCVOut.getContext('2d');
+
     const startBtn = document.getElementById("start_btn");
     startBtn.onclick = function() {
         state.menu.showMenu     = false;

@@ -8,10 +8,6 @@ body {
 .input_video.selfie {
   transform: scale(-1, 1); }
 
-.output_canvas {
-  height: 480px;
-  width: 640px; }
-
 .menu {
   background-color: #444141;
   height: 480px;
