@@ -93,27 +93,54 @@ class Trial {
         return false;
     }
 
-    updateStartBtnInputLoc(state) {
+    updateBackBtnInputLoc(state) {
         
         let tl = new cv.Point(
             state.technique.grid.input.x_cols[0] + state.technique.grid.input.width + 10,
-            state.technique.grid.input.y_rows[0] + state.technique.grid.input.height/2 - 25
+            state.technique.grid.input.y_rows[0] + state.technique.grid.input.height/2 - 45
         );
 
         let br = new cv.Point(
-            state.technique.grid.input.x_cols[0] + state.technique.grid.input.width + 10 + 70,
-            state.technique.grid.input.y_rows[0] + state.technique.grid.input.height/2 + 25
+            state.technique.grid.input.x_cols[0] + state.technique.grid.input.width + 10 + 130,
+            state.technique.grid.input.y_rows[0] + state.technique.grid.input.height/2 + 45
         );
 
         if (state.technique.type == TechniqueType.H2S_Absolute) {
             tl = new cv.Point(
                 state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10,
-                state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 - 25
+                state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 - 45
             );
 
             br = new cv.Point(
-                state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10 + 70,
-                state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 + 25    
+                state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10 + 130,
+                state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 + 45    
+            );
+        } 
+
+        this.backBtn.rect = new cv.Rect(tl.x, tl.y, br.x-tl.x, br.y-tl.y);
+    }
+
+    updateStartBtnInputLoc(state) {
+        
+        let tl = new cv.Point(
+            state.technique.grid.input.x_cols[0] + state.technique.grid.input.width + 10,
+            state.technique.grid.input.y_rows[0] + state.technique.grid.input.height/2 - 45
+        );
+
+        let br = new cv.Point(
+            state.technique.grid.input.x_cols[0] + state.technique.grid.input.width + 10 + 100,
+            state.technique.grid.input.y_rows[0] + state.technique.grid.input.height/2 + 45
+        );
+
+        if (state.technique.type == TechniqueType.H2S_Absolute) {
+            tl = new cv.Point(
+                state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10,
+                state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 - 45
+            );
+
+            br = new cv.Point(
+                state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10 + 100,
+                state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 + 45    
             );
         } 
 
@@ -122,10 +149,33 @@ class Trial {
 
     drawBackBtn(state) {
         if (this.status == TrialState.DONE) {
+
+            let tl = new cv.Point(
+                state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10,
+                state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 - 45
+            );
+    
+            let br = new cv.Point(
+                state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10 + 120,
+                state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 + 45
+            );
+    
+            if (state.technique.type == TechniqueType.H2S_Absolute) {
+                tl = new cv.Point(
+                    state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10,
+                    state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 - 45
+                );
+    
+                br = new cv.Point(
+                    state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10 + 120,
+                    state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 + 45    
+                );
+            }
+
             cv.rectangle(
                 state.overlay,
-                new cv.Point(this.backBtn.rect.x, this.backBtn.rect.y),
-                new cv.Point(this.backBtn.rect.x + this.backBtn.rect.width/2, this.backBtn.rect.y + this.backBtn.rect.height),
+                tl,
+                br,
                 this.backBtn.color,
                 -1
             );
@@ -133,12 +183,9 @@ class Trial {
             cv.putText(
                 state.overlay,
                 this.backBtn.label,
-                new cv.Point(
-                    -30 + this.backBtn.rect.x + this.backBtn.rect.width/2, 
-                    this.backBtn.rect.y + this.backBtn.rect.height/2 + 5
-                ),
+                new cv.Point(-45 + (tl.x + br.x)/2, (tl.y + br.y + 10)/2),
                 cv.FONT_HERSHEY_SIMPLEX,
-                0.3,
+                0.8,
                 new cv.Scalar(225, 225, 225),
                 2
             );
@@ -191,9 +238,9 @@ class Trial {
                 cv.putText(
                     state.overlay,
                     this.startBtn.label,
-                    new cv.Point(-15 + (tl.x + br.x)/2, (tl.y + br.y + 10)/2),
+                    new cv.Point(-30 + (tl.x + br.x)/2, (tl.y + br.y + 10)/2),
                     cv.FONT_HERSHEY_SIMPLEX,
-                    0.4,
+                    0.8,
                     new cv.Scalar(225, 225, 225),
                     2
                 );
@@ -264,8 +311,9 @@ class Trial {
         }
 
         if (this.status == TrialState.STARTED) {
+            
             cv.rectangle(
-                state.outputCV,
+                state.overlay,
                 new cv.Point(
                     state.technique.grid.output.x_cols[this.targetSeq[this.targetID].col_j],
                     state.technique.grid.output.y_rows[this.targetSeq[this.targetID].row_i]
@@ -274,7 +322,7 @@ class Trial {
                     state.technique.grid.output.x_cols[this.targetSeq[this.targetID].col_j] + state.technique.grid.output.dx_col,
                     state.technique.grid.output.y_rows[this.targetSeq[this.targetID].row_i] + state.technique.grid.output.dy_row    
                 ),
-                new cv.Scalar(45, 145, 69),
+                new cv.Scalar(128, 0, 128),
                 -1
             );
         }

@@ -74,6 +74,7 @@ window.onload = function() {
     canvasCVOut.style.height = state.config.CAMHEIGHT + "px";
     
     const canvasCVOutCtx = canvasCVOut.getContext('2d');
+    state.canvasCVOutCtx = canvasCVOutCtx;
 
     const startBtn = document.getElementById("start_btn");
     startBtn.onclick = function() {
@@ -176,6 +177,7 @@ window.onload = function() {
             state.technique.calculate(state);
             
             state.experiment.trial.updateStartBtnInputLoc(state);
+            state.experiment.trial.updateBackBtnInputLoc(state);
 
             state.trigger.update(state);
 
@@ -243,7 +245,8 @@ window.onload = function() {
             state.experiment.trial.drawStartBtn(state);
             state.experiment.trial.drawBackBtn(state);
             state.experiment.trial.drawCompletedTargetsText(state);
-
+            state.experiment.trial.drawTarget(state);
+            
             
             cv.addWeighted(
                 state.overlay, 
@@ -254,7 +257,6 @@ window.onload = function() {
                 state.outputCV, 
                 -1);
                 
-            state.experiment.trial.drawTarget(state);
 
             state.overlay.delete();
 
@@ -291,6 +293,8 @@ window.onload = function() {
 
         cv.imshow('cv_output_canvas', state.outputCV);
 
+
+
         if (state.initiator.left.show &&
             state.selection.currentBtn.row_i != -1 &&
             state.selection.currentBtn.col_j != -1) {
@@ -304,6 +308,9 @@ window.onload = function() {
                     state.technique.grid.output.dx_col,
                     state.technique.grid.output.dy_row
                 );                
+
+
+
         }
 
         if (state.cursorPath.head != null) {

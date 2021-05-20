@@ -1,6 +1,6 @@
 class Config {
     constructor() {
-        this.TRANSPARENCY_ALPHA = 0.6;
+        this.TRANSPARENCY_ALPHA = 0.5;
         this.DWELLWAIT_MS       = 600;
         this.CAMWIDTH           = 1280;
         this.CAMHEIGHT          = 720;
