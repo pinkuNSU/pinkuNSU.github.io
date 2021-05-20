@@ -5,6 +5,7 @@ class Config {
         this.CAMWIDTH           = 1280;
         this.CAMHEIGHT          = 720;
         this.IMGPALM_DIMMAX     = Math.min(this.CAMHEIGHT, this.CAMWIDTH)/3;
+        this.ABSOLUTEWIDTH      = 350;
         this.progressbar = {
             MAXWIDTH: this.CAMWIDTH/8,
             MAXHEIGHT: this.CAMHEIGHT/28

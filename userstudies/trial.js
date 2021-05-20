@@ -152,23 +152,23 @@ class Trial {
 
         let tl = new cv.Point(
             state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10,
-            state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 - 20
+            state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 - 45
         );
 
         let br = new cv.Point(
-            state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10 + 35,
-            state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 + 20
+            state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10 + 90,
+            state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 + 45
         );
 
         if (state.technique.type == TechniqueType.H2S_Absolute) {
             tl = new cv.Point(
                 state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10,
-                state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 - 20
+                state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 - 45
             );
 
             br = new cv.Point(
-                state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10 + 35,
-                state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 + 20    
+                state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10 + 90,
+                state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 + 45    
             );
         }
 

@@ -4,7 +4,8 @@ const TechniqueType = {
     S2H_Absolute: 2,
     H2S_Relative: 3,
     H2S_Absolute: 4,
-    MidAir: 5
+    MidAir: 5,
+    FishEye: 6
 }
 
 

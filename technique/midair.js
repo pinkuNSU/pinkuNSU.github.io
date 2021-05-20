@@ -9,15 +9,7 @@ class MidAir {
         this.parent.alwaysShow = true;
         this.parent.invertTrigger = true;
 
-        this.parent.grid.input.width    = state.width/3;
-        this.parent.grid.input.height   = state.height/3;
-        this.parent.grid.output.width   = state.width/3;
-        this.parent.grid.output.height  = state.height/3;
-
-        this.parent.grid.input.x    = state.width/2 - this.parent.grid.input.width/2;
-        this.parent.grid.input.y    = state.height/2 - this.parent.grid.input.height/2;
-        this.parent.grid.output.x   = state.width/2 - this.parent.grid.output.width/2;
-        this.parent.grid.output.y   = state.height/2 - this.parent.grid.output.height/2;
+        this.parent._setGridAbsolute(state);
     }
 
     calculate(state) {

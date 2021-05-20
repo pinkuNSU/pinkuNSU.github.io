@@ -1,4 +1,4 @@
-class Grid {
+class GridFishEye {
     constructor(state, name) {
         this.name = name;
         this.height = state.height/4;
@@ -9,6 +9,8 @@ class Grid {
         this.divisions = state.menu.cellscnt;
         this.x_cols = Array(11);
         this.y_rows = Array(11);
+        this.col_widths = Array(11);
+        this.row_heights = Array(11);
     }
 
     getBottomMiddle() {
@@ -28,14 +30,14 @@ class Grid {
         for (var i = 2; i <= this.divisions; i ++) {
             this.x_cols[i] = this.x_cols[i-1] + this.dx_col + this.gap;
         }
-        this.x_cols[this.divisions + 1] = this.x + this.width;
+        this.x_cols[this.divisions + 1] = this.x_cols[this.division] + this.dx_col + this.gap;
 
         this.y_rows[0] = this.y;
         this.y_rows[1] = this.y_rows[0] + this.gap;
         for (var i = 2; i <= this.divisions; i ++) {
             this.y_rows[i] = this.y_rows[i-1] + this.dy_row + this.gap;
         }
-        this.y_rows[this.divisions + 1] = this. y + this.height;
+        this.y_rows[this.divisions + 1] = this.y_rows[this.divisions] + this.dy_row + this.gap;
     }
 
     btnPointedBy(cursor) {
@@ -51,14 +53,14 @@ class Grid {
             if (cursor.x >= this.x_cols[0] && cursor.x <= this.x_cols[0]+this.width &&
                 cursor.y >= this.y_rows[0] && cursor.y <= this.y_rows[0]+this.height) {
                     
-                    for (let j = 1; j <= this.divisions; j ++) {
+                    for (var j = 1; j <= this.divisions; j ++) {
                         if (cursor.x >= this.x_cols[j] && (cursor.x <= this.x_cols[j] + this.dx_col)) {
                             ret.col_j = j;
                             break;
                         }
                     }
                     
-                    for (let i = 1; i <= this.divisions; i ++) {
+                    for (var i = 1; i <= this.divisions; i ++) {
                         if (cursor.y >= this.y_rows[i] && (cursor.y <= this.y_rows[i] + this.dy_row)) {
                             ret.row_i = i;
                             break;
@@ -81,4 +83,4 @@ class Grid {
     }
 }
 
-export {Grid};
+export {GridFishEye};

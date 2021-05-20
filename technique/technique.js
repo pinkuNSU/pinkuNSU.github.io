@@ -1,25 +1,34 @@
-import {S2HRelative} from './s2h_rel.js';
-import {S2HAbsolute} from './s2h_abs.js';
-import {H2SRelative} from './h2s_rel.js';
-import { MidAir }    from './midair.js';
-
-import {Grid} from '../ds/grid.js';
+import {S2HRelative}     from './s2h_rel.js';
+import {S2HAbsolute}     from './s2h_abs.js';
+import {H2SRelative}     from './h2s_rel.js';
+import {MidAir}          from './midair.js';
+import {FishEye}         from './fisheye.js';
+import {Grid}            from '../ds/grid.js';
 import { TechniqueType } from './constant.js';
-import { H2SAbsolute } from './h2s_abs.js';
+import { H2SAbsolute }   from './h2s_abs.js';
+import {GridFishEye}     from '../ds/gridfisheye.js';
 
 
 class Technique {
     constructor(state) {
         this.type = TechniqueType.Unassigned;
+        
+        this.name = state.menu.technique;
+        
         this.grid = {}
-        this.grid.input = new Grid(state, "input");
-        this.grid.output = new Grid(state, "output");
-                
+        
+        if (this.name.toLowerCase().includes("fisheye")) {
+            this.grid.input = new GridFishEye(state, "fisheye_input");
+            this.grid.output = new GridFishEye(state, "fisheye_output");
+        } else {
+            this.grid.input = new Grid(state, "input");
+            this.grid.output = new Grid(state, "output");
+        }
+        
         this.last_time_visited = [...Array(11)].map(e => Array(11));
         this.visited_cells = 0;
         this.message = "";
 
-        this.name = state.menu.technique;
 
         this.stats = {
             visitedCells: 0
@@ -58,6 +67,9 @@ class Technique {
                 break;
             case "MidAir":
                 this.anchor = new MidAir(this, state);
+                break;
+            case "FishEye":
+                this.anchor = new FishEye(this, state);
                 break;
             default:
                 break;
@@ -191,6 +203,20 @@ class Technique {
         );
     }
 
+    _setGridAbsolute(state) { 
+        const w = state.config.ABSOLUTEWIDTH;
+        
+        this.grid.input.width    = w;
+        this.grid.input.height   = w;
+        this.grid.output.width   = w;
+        this.grid.output.height  = w;
+        
+        this.grid.input.x    = state.width/2 - w/2;
+        this.grid.input.y    = state.height/2 - w/2;
+        this.grid.output.x   = state.width/2 - w/2;
+        this.grid.output.y   = state.height/2 - w/2;
+    }
+
     _drawCells(state) {
         for (var i = 1; i <= this.grid.output.divisions; i ++) {
             for (var j = 1; j <= this.grid.output.divisions; j ++) {
@@ -206,8 +232,8 @@ class Technique {
                     state.overlay,
                     new cv.Point(this.grid.output.x_cols[j], this.grid.output.y_rows[i]),
                     new cv.Point(
-                        this.grid.output.x_cols[j] + this.grid.output.dx_col, 
-                        this.grid.output.y_rows[i] + this.grid.output.dy_row),
+                        this.grid.output.x_cols[j+1] - this.grid.output.gap, 
+                        this.grid.output.y_rows[i+1] - this.grid.output.gap),
                     c,
                     -1
                 );
