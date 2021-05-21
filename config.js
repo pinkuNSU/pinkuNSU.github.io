@@ -11,7 +11,10 @@ class Config {
             MAXHEIGHT: this.CAMHEIGHT/28
         }; // todo use this
         this.fisheye = {
-            MAXWEIGHT: 4
+            weights: {
+                MAX: 5,
+                NEIGHBOR: 3
+            }
         };
     };
 }
