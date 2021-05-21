@@ -32,6 +32,9 @@ class FishEye {
                 this.parent.grid.output.align(state);
 
                 this.parent._setupSelection(state);
+
+                this.parent.grid.input.setMajorWeight(state);
+                this.parent.grid.output.setMajorWeight(state);
         }
     }
 

@@ -10,6 +10,9 @@ class Config {
             MAXWIDTH: this.CAMWIDTH/8,
             MAXHEIGHT: this.CAMHEIGHT/28
         }; // todo use this
+        this.fisheye = {
+            MAXWEIGHT: 4
+        };
     };
 }
 

@@ -305,8 +305,8 @@ window.onload = function() {
                 canvasCVOutCtx.strokeRect(
                     state.technique.grid.output.x_cols[state.selection.currentBtn.col_j], 
                     state.technique.grid.output.y_rows[state.selection.currentBtn.row_i], 
-                    state.technique.grid.output.dx_col,
-                    state.technique.grid.output.dy_row
+                    state.technique.grid.output.x_cols[state.selection.currentBtn.col_j+1] - state.technique.grid.output.x_cols[state.selection.currentBtn.col_j], 
+                    state.technique.grid.output.y_rows[state.selection.currentBtn.row_i+1] - state.technique.grid.output.y_rows[state.selection.currentBtn.row_i]
                 );                
 
 

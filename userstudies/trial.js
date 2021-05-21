@@ -319,8 +319,8 @@ class Trial {
                     state.technique.grid.output.y_rows[this.targetSeq[this.targetID].row_i]
                 ),
                 new cv.Point(
-                    state.technique.grid.output.x_cols[this.targetSeq[this.targetID].col_j] + state.technique.grid.output.dx_col,
-                    state.technique.grid.output.y_rows[this.targetSeq[this.targetID].row_i] + state.technique.grid.output.dy_row    
+                    state.technique.grid.output.x_cols[this.targetSeq[this.targetID].col_j+1] - state.technique.grid.output.gap,
+                    state.technique.grid.output.y_rows[this.targetSeq[this.targetID].row_i+1] - state.technique.grid.output.gap    
                 ),
                 new cv.Scalar(128, 0, 128),
                 -1
