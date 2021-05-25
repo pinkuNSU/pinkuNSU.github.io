@@ -25,13 +25,11 @@ class Technique {
             this.grid.output = new Grid(state, "output");
         }
         
-        this.last_time_visited = [...Array(11)].map(e => Array(11));
-        this.visited_cells = 0;
         this.message = "";
 
-
         this.stats = {
-            visitedCells: 0
+            visitedCells: 0,
+            lastVisitTime: [...Array(11)].map(e => Array(11))
         };
 
         this.images = {
@@ -49,8 +47,6 @@ class Technique {
                 image: null
             }
         };
-
-        console.log("tech name:", this.name);
         
         switch(this.name) {
             case "S2H_Relative":
@@ -88,7 +84,7 @@ class Technique {
         const t = performance.now();
         for (let i = 0; i < 11; i ++) {
             for (let j = 0; j < 11; j ++) {
-                this.last_time_visited[i][j] = t;
+                this.stats.lastVisitTime[i][j] = t;
             }
         }
     }
@@ -177,10 +173,10 @@ class Technique {
             if (btn.row_i != state.selection.previousBtn.row_i || 
                 btn.col_j != state.selection.previousBtn.col_j) {
                 
-                this.last_time_visited[btn.row_i][btn.col_j] = performance.now();
+                this.stats.lastVisitTime[btn.row_i][btn.col_j] = performance.now();
                 state.selection.messages.selected = 
                     `Highlighted: ${(btn.row_i-1)*this.grid.input.divisions + btn.col_j}`;
-                this.visited_cell += 1;
+                this.stats.visitedCells ++;
             }
             
             state.selection.currentBtn.row_i = btn.row_i;
@@ -218,8 +214,8 @@ class Technique {
     }
 
     _drawCells(state) {
-        for (var i = 1; i <= this.grid.output.divisions; i ++) {
-            for (var j = 1; j <= this.grid.output.divisions; j ++) {
+        for (let i = 1; i <= this.grid.output.divisions; i ++) {
+            for (let j = 1; j <= this.grid.output.divisions; j ++) {
                 let c = new cv.Scalar(255, 25, 25);
                 
                 if(i == state.selection.markedBtn.row_i && 

@@ -13,6 +13,4 @@ const TrialBtnState = {
     READY: 3
 };
 
-
-
 export {TrialState, TrialBtnState};

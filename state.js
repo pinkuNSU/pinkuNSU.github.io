@@ -36,9 +36,6 @@ class State {
     }
 
     updateCursorPath() {
-
-        // console.log("updateCursorPath this.cursorPath:", this.cursorPath);
-        // return;
         if (!this.cursor) return;
 
         if (this.cursorPath.tail == null) {
@@ -86,7 +83,7 @@ class State {
             ret.x = this.initiator.left.landmarks[this.palmLandmarkIDs[0]].x;
             ret.y = this.initiator.left.landmarks[this.palmLandmarkIDs[0]].y;
             
-            for (var i = 1, len = this.palmLandmarkIDs.length; i < len; i ++) {
+            for (let i = 1, len = this.palmLandmarkIDs.length; i < len; i ++) {
                 
                 const l = this.initiator.left.landmarks[this.palmLandmarkIDs[i]];
                 
@@ -120,7 +117,7 @@ function getState() {
 
 function checkRadio(tag) {
     const radios = document.getElementsByName(tag);
-    for (var i = 0, length = radios.length; i < length; i++) {
+    for (let i = 0, length = radios.length; i < length; i++) {
         if (radios[i].checked) return radios[i].value;
     }
 

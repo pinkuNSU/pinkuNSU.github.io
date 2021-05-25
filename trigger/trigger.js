@@ -11,7 +11,6 @@ class Trigger {
 
         if (this.name == 'Dwell') this.trigger = new Dwell(this);
         else if (this.name == 'Tap') this.trigger = new Tap(this);
-        console.log("trigger:", this);
     }
 
     update(state) {

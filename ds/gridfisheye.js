@@ -3,6 +3,7 @@ class GridFishEye {
         this.name = name;
         this.height = state.height / 4;
         this.width = state.width / 4;
+        this.widthHalf = this.width / 2;
         this.x = 0;
         this.y = 0;
         this.gap = 3;
@@ -14,24 +15,29 @@ class GridFishEye {
         this.row_weights = Array(11);
         this.weightSum = {
             col: 0,
-            row: 0
+            row: 0,
+            coltype: 0,
+            rowtype: 0
         };
 
-        this.col_weights[1] = state.config.fisheye.weights.MAX;
-        this.row_weights[1] = state.config.fisheye.weights.MAX;
-        for (let i = 1; i <= this.divisions; i++) {
-            this.col_weights[i] = 1;
-            this.row_weights[i] = 1;
-        }
-    }
+        this.maxLocation = {
+            col_x: -1,
+            row_y: -1
+        };
 
-    _sumRowWeights() {
+        // console.group(`gridfisheye: ${this.name}`);
+        // console.table(state.config);
+        // console.groupEnd();
+
+        for (let i = 1; i <= this.divisions; i++) {
+            this.col_weights[i] = state.config.fisheye.weights.NORMAL;
+            this.row_weights[i] = state.config.fisheye.weights.NORMAL;
+        }
+
         this.weightSum.col = 0;
         for (let i = 1; i <= this.divisions; i++)
             this.weightSum.col += this.col_weights[i];
-    }
 
-    _sumColWeights() {
         this.weightSum.row = 0;
         for (let i = 1; i <= this.divisions; i++)
             this.weightSum.row += this.row_weights[i];
@@ -39,7 +45,7 @@ class GridFishEye {
 
     getBottomMiddle() {
         return {
-            x: this.x + this.width / 2,
+            x: this.x + this.widthHalf,
             y: this.y + this.height
         };
     }
@@ -48,23 +54,77 @@ class GridFishEye {
         const row_y = state.selection.currentBtn.row_i;
         const col_x = state.selection.currentBtn.col_j;
 
-        for (let j = 1; j <= this.divisions; j++)
-            this.col_weights[j] = 1;
+        if (this.maxLocation.col_x != col_x) {
+            for (let j = 1; j <= this.divisions; j++)
+                this.col_weights[j] = state.config.fisheye.weights.NORMAL;
 
-        this.col_weights[col_x - 1] = state.config.fisheye.weights.NEIGHBOR;
-        this.col_weights[col_x] = state.config.fisheye.weights.MAX;
-        this.col_weights[col_x + 1] = state.config.fisheye.weights.NEIGHBOR;
+            this.col_weights[col_x - 1] = state.config.fisheye.weights.NEIGHBOR;
+            this.col_weights[col_x] = state.config.fisheye.weights.MAX;
+            this.col_weights[col_x + 1] = state.config.fisheye.weights.NEIGHBOR;
 
-        for (let i = 1; i <= this.divisions; i++)
-            this.row_weights[i] = 1;
-        this.row_weights[row_y - 1] = state.config.fisheye.weights.NEIGHBOR;
-        this.row_weights[row_y] = state.config.fisheye.weights.MAX;
-        this.row_weights[row_y + 1] = state.config.fisheye.weights.NEIGHBOR;
+            this.maxLocation.col_x = col_x;
+
+            if (col_x == 1 || col_x == this.divisions) {
+                if (this.weightSum.coltype == 0) {
+                    this.weightSum.col -= state.config.fisheye.weights.NORMAL2;
+                    this.weightSum.col += state.config.fisheye.weights.SUMMAXNEIGHBOR;
+
+                } else if (this.weightSum.coltype == 1) {
+                    this.weightSum.col -= state.config.fisheye.weights.NEIGHBOR;
+                    this.weightSum.col += state.config.fisheye.weights.NORMAL;
+                }
+
+                this.weightSum.coltype = 2;
+            } else {
+                if (this.weightSum.coltype == 0) {
+                    this.weightSum.col -= state.config.fisheye.weights.NORMAL3;
+                    this.weightSum.col += state.config.fisheye.weights.SUMMAX2NEIGHBOR;
+                } else if (this.weightSum.coltype == 2) {
+                    this.weightSum.col -= state.config.fisheye.weights.NORMAL;
+                    this.weightSum.col += state.config.fisheye.weights.NEIGHBOR;
+                }
+
+                this.weightSum.coltype = 1;
+            }
+        }
+
+        if (this.maxLocation.row_y != row_y) {
+            for (let i = 1; i <= this.divisions; i++)
+                this.row_weights[i] = state.config.fisheye.weights.NORMAL;
+
+            this.row_weights[row_y - 1] = state.config.fisheye.weights.NEIGHBOR;
+            this.row_weights[row_y] = state.config.fisheye.weights.MAX;
+            this.row_weights[row_y + 1] = state.config.fisheye.weights.NEIGHBOR;
+
+            this.maxLocation.row_y = row_y;
+
+            if (row_y == 1 || row_y == this.divisions) {
+                if (this.weightSum.rowtype == 0) {
+                    this.weightSum.row -= state.config.fisheye.weights.NORMAL2;
+                    this.weightSum.row += state.config.fisheye.weights.SUMMAXNEIGHBOR;
+
+                } else if (this.weightSum.rowtype == 1) {
+                    this.weightSum.row -= state.config.fisheye.weights.NEIGHBOR;
+                    this.weightSum.row += state.config.fisheye.weights.NORMAL;
+                }
+
+                this.weightSum.rowtype = 2;
+            } else {
+                if (this.weightSum.rowtype == 0) {
+                    this.weightSum.row -= state.config.fisheye.weights.NORMAL3;
+                    this.weightSum.row += state.config.fisheye.weights.SUMMAX2NEIGHBOR;
+                } else if (this.weightSum.rowtype == 2) {
+                    this.weightSum.row -= state.config.fisheye.weights.NORMAL;
+                    this.weightSum.row += state.config.fisheye.weights.NEIGHBOR;
+                }
+
+                this.weightSum.rowtype = 1;
+            }
+        }
     }
 
     align(state) {
-        this._sumRowWeights();
-        this._sumColWeights();
+
         this.dx_col = (this.width - (this.divisions + 1) * this.gap) / this.weightSum.col;
         this.dy_row = (this.height - (this.divisions + 1) * this.gap) / this.weightSum.row;
 

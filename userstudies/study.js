@@ -1,7 +1,11 @@
 
 class Study {
     constructor(state) {
-        
+
+    }
+
+    save(state) {
+
     }
 }
 

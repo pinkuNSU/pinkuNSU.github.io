@@ -130,13 +130,6 @@ class Initiator {
         } else {
             this.left.dataID = null;
             this.left.show = false;
-            for (let i = 0; i < 21; i++) {
-                this.left.landmarks[i].x = 0;
-                this.left.landmarks[i].y = 0;
-                this.left.landmarks[i].z = 0;
-            }
-
-
         }
 
         if (rgt) {
@@ -144,11 +137,6 @@ class Initiator {
         } else {
             this.right.dataID = null;
             this.right.show = false;
-            for (let i = 0; i < 21; i++) {
-                this.right.landmarks[i].x = 0;
-                this.right.landmarks[i].y = 0;
-                this.right.landmarks[i].z = 0;
-            }
         }
 
         this.show = (this.left.show | this.right.show) ? true : false;

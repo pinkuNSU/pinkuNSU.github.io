@@ -7,8 +7,6 @@ class S2HAbsolute {
         this.parent.type = TechniqueType.S2H_Absolute;
 
         this.parent._setGridAbsolute(state);
-
-        console.log("this.parent.grid:", this.parent.grid);
     }
 
     calculate(state) {

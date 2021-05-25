@@ -25,14 +25,14 @@ class Grid {
 
         this.x_cols[0] = this.x;
         this.x_cols[1] = this.x_cols[0] + this.gap;
-        for (var i = 2; i <= this.divisions; i ++) {
+        for (let i = 2; i <= this.divisions; i ++) {
             this.x_cols[i] = this.x_cols[i-1] + this.dx_col + this.gap;
         }
         this.x_cols[this.divisions + 1] = this.x + this.width;
 
         this.y_rows[0] = this.y;
         this.y_rows[1] = this.y_rows[0] + this.gap;
-        for (var i = 2; i <= this.divisions; i ++) {
+        for (let i = 2; i <= this.divisions; i ++) {
             this.y_rows[i] = this.y_rows[i-1] + this.dy_row + this.gap;
         }
         this.y_rows[this.divisions + 1] = this. y + this.height;

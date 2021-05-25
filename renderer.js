@@ -8,12 +8,14 @@ import {TRIGGER} from './trigger/triggerstate.js';
 import { Trial } from './userstudies/trial.js';
 import {TrialState} from './userstudies/constant.js';
 import {TechniqueType} from "./technique/constant.js";
+import { Study } from './userstudies/study.js';
 
 // previous code is here
 
 
 
 window.onload = function() {
+
 
     const userIDElement = document.getElementById('selectUserID');
     
@@ -77,6 +79,17 @@ window.onload = function() {
     state.canvasCVOutCtx = canvasCVOutCtx;
 
     const startBtn = document.getElementById("start_btn");
+
+    document.addEventListener("keypress", function(event) {
+        console.group("document keypress event");
+        console.table(event);
+        console.groupEnd();
+        if (event.key == "Enter") {
+            event.preventDefault();
+            startBtn.click();
+        }
+    });
+
     startBtn.onclick = function() {
         state.menu.showMenu     = false;
         state.menu.technique    = checkRadio("menutechnique");
@@ -95,10 +108,14 @@ window.onload = function() {
         state.initiator = new Initiator(state);
         state.technique = new Technique(state);
         state.trigger = new Trigger(state);
+
+        state.experiment = {
+            trial: new Trial(state),
+            study1: new Study(state),
+            prev_marked_i: -1,
+            prev_marked_j: -1
+        };
         
-        state.experiment.trial = new Trial(state);
-        state.experiment.prev_marked_i = -1;
-        state.experiment.prev_marked_j = -1;
         state.experiment.trial.generateTarget(state);
 
         const hands = new Hands({locateFile: (file) => {
@@ -172,6 +189,18 @@ window.onload = function() {
             state.trigger.reset(state);
         }
 
+        // todo move to webworker
+        if (state.experiment.trial.status == TrialState.STARTED) {
+            state.experiment.trial.updateCursorDistTraveled(state);
+            state.experiment.trial.updateLeftPalmDist(state);
+            state.experiment.trial.updateRightPalmDist(state);
+            state.experiment.trial.updateTargetTime();
+
+            state.experiment.trial.updateVisitedCells(state);
+            
+            state.experiment.trial.updateTargetLastVisitTime(state);
+        }
+
         if (state.initiator.show || state.technique.alwaysShow) {
 
             state.technique.calculate(state);
@@ -191,13 +220,10 @@ window.onload = function() {
 
             switch(state.trigger.status) {
                 case TRIGGER.ONHOLD:
-                    // console.log("switch TRIGGER.ONHOLD");
                     break;
                 case TRIGGER.OPEN:
-                    // console.log("switch TRIGGER.OPEN");
                     break;
                 case TRIGGER.PRESSED:
-                    // console.log("switch TRIGGER.PRESSED");
                     if (state.technique.grid.input.isCursorInside(state)) {
                         state.selection.adjustSelection();
                         state.lockSelection();
@@ -206,14 +232,11 @@ window.onload = function() {
                     break;
                 case TRIGGER.RELEASED:
                     state.resetCursorPath();
-                    // console.log("switch TRIGGER.RELEASED");
                     if (state.experiment.trial.isCursorOverStartBtn(state)) {
-                        // console.log("RELASED over trial btn")
                         state.experiment.trial.clickStartBtn(state);
                         state.technique.stats.visitedCells = 0;
                         resetAnchor = true;
                     } else if(state.experiment.trial.isCursorOverBackBtn(state)) {
-                        console.log("RELEASED over back btn");
                         goBackToMenu();
                     } else if (state.experiment.trial.status == TrialState.STARTED){
                         
@@ -221,6 +244,10 @@ window.onload = function() {
                         state.experiment.trial.incrementAttempts();
                         
                         if (state.experiment.trial.matched(state)) {
+                            if (!state.menu.practice) {
+                                state.experiment.study1.save(state);
+                            }
+
                             state.experiment.trial.clickTarget(state);
                             state.experiment.trial.generateTarget(state);
                             resetAnchor = true;
@@ -293,8 +320,6 @@ window.onload = function() {
 
         cv.imshow('cv_output_canvas', state.outputCV);
 
-
-
         if (state.initiator.left.show &&
             state.selection.currentBtn.row_i != -1 &&
             state.selection.currentBtn.col_j != -1) {
@@ -308,9 +333,6 @@ window.onload = function() {
                     state.technique.grid.output.x_cols[state.selection.currentBtn.col_j+1] - state.technique.grid.output.x_cols[state.selection.currentBtn.col_j], 
                     state.technique.grid.output.y_rows[state.selection.currentBtn.row_i+1] - state.technique.grid.output.y_rows[state.selection.currentBtn.row_i]
                 );                
-
-
-
         }
 
         if (state.cursorPath.head != null) {
@@ -346,6 +368,27 @@ window.onload = function() {
                 state.technique.inputBound.bottomright.x - state.technique.inputBound.topleft.x,
                 state.technique.inputBound.bottomright.y - state.technique.inputBound.topleft.y
             );
+        }
+
+        if (state.menu.debug) {
+            // draw trial stats
+            canvasCVOutCtx.font = "24px Georgia";
+            canvasCVOutCtx.fillStyle = "fuchsia";
+            canvasCVOutCtx.fillText(
+                `targets visit time: ${state.experiment.trial.lastVisitTime()} ms`, 
+                10, state.height - 130);
+            canvasCVOutCtx.fillText(
+                `elapsed time: ${state.experiment.trial.elapsedTime()} ms`, 
+                10, state.height - 110);
+            canvasCVOutCtx.fillText(
+                `cursor distance: ${state.experiment.trial.stats.distance.cursor[state.experiment.trial.targetID].toFixed(1)} pixels`, 
+                10, state.height - 90);
+            canvasCVOutCtx.fillText(
+                `attempts: ${state.experiment.trial.stats.attempts[state.experiment.trial.targetID]}`, 
+                10, state.height - 70);
+            canvasCVOutCtx.fillText(
+                `m visited cells: ${state.experiment.trial.stats.visitedCells[state.experiment.trial.targetID]}`, 
+                10, state.height - 50);
         }
 
         if (state.outputCV) {

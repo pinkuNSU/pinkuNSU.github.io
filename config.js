@@ -12,8 +12,13 @@ class Config {
         }; // todo use this
         this.fisheye = {
             weights: {
-                MAX: 5,
-                NEIGHBOR: 3
+                MAX: 8,
+                NEIGHBOR: 4,
+                NORMAL: 3,
+                NORMAL2: 6,
+                NORMAL3: 9,
+                SUMMAXNEIGHBOR: 12,
+                SUMMAX2NEIGHBOR: 16
             }
         };
     };

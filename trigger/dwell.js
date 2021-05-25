@@ -6,7 +6,7 @@ class Dwell {
         this.parent = parent;
         
         this.visitTime = Array(11);
-        for (var i = 0; i < 11; i ++)
+        for (let i = 0; i < 11; i ++)
             this.visitTime[i] = new Array(11);
         
         this.curTime = performance.now();
@@ -95,15 +95,15 @@ class Dwell {
     }
 
     _initGridVisitTime(ctime) {
-        for (var i = 0; i < 11; i ++) {
-            for (var j = 0; j < 11; j ++) {
+        for (let i = 0; i < 11; i ++) {
+            for (let j = 0; j < 11; j ++) {
                 this.visitTime[i][j] = ctime;
             }
         }
     }
 
     reset() {
-        
+        this._initGridVisitTime(performance.now());  
     }
 }
 
