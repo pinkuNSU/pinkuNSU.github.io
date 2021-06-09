@@ -18,6 +18,8 @@ class State {
         this.initiator = null;
         this.cursor = null;
         this.palmLandmarkIDs = [0, 1, 5, 9, 13, 17]; // TODO make it static
+        this.fingersLandmarkIDs = [6, 8, 12, 16, 18, 20]; // TODO make it static
+        
         this.progressBar = {
             size: -1,
             maxWidth: 100,
@@ -66,6 +68,39 @@ class State {
             this.selection.locked = true;
             this.selection.lastLockTime = performance.now();
         }
+    }
+
+    fingersRect() {
+        let ret = {
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0,
+            mxx: 0,
+            mxy: 0,
+            maxDim: 0
+        }
+
+        if (this.initiator && this.initiator.left.landmarks) {
+            ret.x = this.initiator.left.landmarks[this.fingersLandmarkIDs[0]].x;
+            ret.y = this.initiator.left.landmarks[this.fingersLandmarkIDs[0]].y;
+            
+            for (let i = 1, len = this.fingersLandmarkIDs.length; i < len; i ++) {
+                
+                const l = this.initiator.left.landmarks[this.fingersLandmarkIDs[i]];
+                
+                ret.x = Math.min(ret.x, l.x);
+                ret.y = Math.min(ret.y, l.y);
+                ret.mxx = Math.max(ret.mxx, l.x);
+                ret.mxy = Math.max(ret.mxy, l.y);
+            }
+
+            ret.width = ret.mxx - ret.x;
+            ret.height = ret.mxy - ret.y;
+            ret.maxDim = Math.max(ret.width, ret.height);
+        }
+
+        return ret;
     }
 
     palmRect() {

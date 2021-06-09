@@ -11,6 +11,10 @@ class Grid {
         this.y_rows = Array(11);
     }
 
+    reset() {
+        // todo figure out
+    }
+
     getBottomMiddle() {
         return {
             x: this.x + this.width/2,

@@ -236,6 +236,7 @@ window.onload = function() {
                         state.experiment.trial.clickStartBtn(state);
                         state.technique.stats.visitedCells = 0;
                         resetAnchor = true;
+                        state.technique.reset();
                     } else if(state.experiment.trial.isCursorOverBackBtn(state)) {
                         goBackToMenu();
                     } else if (state.experiment.trial.status == TrialState.STARTED){

@@ -7,6 +7,8 @@ import {Grid}            from '../ds/grid.js';
 import { TechniqueType } from './constant.js';
 import { H2SAbsolute }   from './h2s_abs.js';
 import {GridFishEye}     from '../ds/gridfisheye.js';
+import {S2HRelativeFinger}     from './s2h_rel_finger.js';
+import {H2SRelativeFinger}     from './h2s_rel_finger.js';
 
 
 class Technique {
@@ -67,6 +69,12 @@ class Technique {
             case "FishEye":
                 this.anchor = new FishEye(this, state);
                 break;
+            case "S2H_Relative_Finger":
+                this.anchor = new S2HRelativeFinger(this, state);
+                break;
+            case "H2S_Relative_Finger":
+                this.anchor = new H2SRelativeFinger(this, state);
+                break;
             default:
                 break;
         }
@@ -78,6 +86,11 @@ class Technique {
 
     draw(state) {
         this.anchor.draw(state);        
+    }
+
+    reset() {
+        this.grid.input.reset();
+        this.grid.output.reset();
     }
 
     resetLastTimeVisited() {

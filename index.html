@@ -67,6 +67,7 @@
               <label class="mr-sm-2" for="selectCells">Number of cells per row/col</label>
               <select class="custom-select mr-sm-2" id="selectCells">
                 <option value="2">2</option>
+                <option value="3">3</option>
                 <option value="4" selected>4</option>
                 <option value="6">6</option>
               </select>
@@ -81,29 +82,31 @@
               <div class="form-check">
                 <input class="form-check-input" type="radio" name="menutechnique" id="menutechnique_s2h_rel" value="S2H_Relative">
                 <label class="form-check-label" for="menutechnique_s2h_rel">
-                  S2H Relative
-                </label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="menutechnique" id="menutechnique_s2h_abs" value="S2H_Absolute">
-                <label class="form-check-label" for="menutechnique_s2h_abs">
-                  S2H Absolute
+                  S2H Relative Palm
                 </label>
               </div>
               
               <div class="form-check">
                 <input class="form-check-input" type="radio" name="menutechnique" id="menutechnique_h2s_rel" value="H2S_Relative">
                 <label class="form-check-label" for="menutechnique_h2s_rel">
-                  H2S Relative
-                </label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="menutechnique" id="menutechnique_h2s_abs" value="H2S_Absolute">
-                <label class="form-check-label" for="menutechnique_h2s_abs">
-                  H2S Absolute
+                  H2S Relative Palm
                 </label>
               </div>
               
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="menutechnique" id="menutechnique_s2h_rel_finger" value="S2H_Relative_Finger">
+                <label class="form-check-label" for="menutechnique_s2h_rel_finger">
+                  S2H Relative Finger
+                </label>
+              </div>
+              
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="menutechnique" id="menutechnique_h2s_rel_finger" value="H2S_Relative_Finger">
+                <label class="form-check-label" for="menutechnique_h2s_rel_finger">
+                  H2S Relative Finger
+                </label>
+              </div>
+
               <div class="form-check">
                 <input class="form-check-input" type="radio" name="menutechnique" id="menutechnique_h2s_midair" value="MidAir">
                 <label class="form-check-label" for="menutechnique_h2s_midair">
@@ -117,6 +120,21 @@
                   FishEye
                 </label>
               </div>
+
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="menutechnique" id="menutechnique_s2h_abs" value="S2H_Absolute">
+                <label class="form-check-label" for="menutechnique_s2h_abs">
+                  S2H Absolute
+                </label>
+              </div>
+
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="menutechnique" id="menutechnique_h2s_abs" value="H2S_Absolute">
+                <label class="form-check-label" for="menutechnique_h2s_abs">
+                  H2S Absolute
+                </label>
+              </div>
+              
             </div>
 
             
@@ -125,7 +143,7 @@
             <div class="row">
               <h2>Trigger</h2>
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="menutrigger" id="menutrigger_s2h_rel" value="Tap">
+                <input class="form-check-input" type="radio" name="menutrigger" id="menutrigger_s2h_rel" value="Tap" disabled>
                 <label class="form-check-label" for="menutrigger_s2h_rel">
                   Tap
                 </label>
