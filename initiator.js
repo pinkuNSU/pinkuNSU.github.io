@@ -126,14 +126,14 @@ class Initiator {
         }
 
         if (lft) {
-            this.left.show = this.left.area > 0.08;
+            this.left.show = this.left.area > 0.04;
         } else {
             this.left.dataID = null;
             this.left.show = false;
         }
 
         if (rgt) {
-            this.right.show = this.right.area > 0.04;
+            this.right.show = this.right.area > 0.02;
         } else {
             this.right.dataID = null;
             this.right.show = false;

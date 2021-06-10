@@ -289,25 +289,9 @@ window.onload = function() {
             state.overlay.delete();
 
         }
-            // for (let index = 0; index < results.multiHandLandmarks.length; index++) {
-            //     const classification = results.multiHandedness[index];
-            //     const isRightHand = classification.label === 'Right';
-            //     const landmarks = results.multiHandLandmarks[index];
-            //     // drawConnectors(
-            //         //     canvasCtx, landmarks, HAND_CONNECTIONS,
-            //         //     {color: isRightHand ? '#00FF00' : '#FF0000'}),
-            //     if (!isRightHand) {
-            //         drawLandmarks(canvasCtx, landmarks, {
-            //             color: isRightHand ? '#00FF00' : '#FF0000',
-            //             fillColor: isRightHand ? '#FF0000' : '#00FF00',
-            //             radius: (x) => {
-            //                 return lerp(x.from.z, -0.15, .1, 10, 1);
-            //                 }
-            //             });
-            //     }
-            // }
-        // }
 
+        
+        
         if (state.cursor) {
             
             const colsz = state.initiator.right.scale;
@@ -372,6 +356,27 @@ window.onload = function() {
         }
 
         if (state.menu.debug) {
+
+            console.log("results.multiHandLandmarks:", results.multiHandLandmarks);
+            if (results.multiHandLandmarks) {
+                for (let index = 0; index < results.multiHandLandmarks.length; index++) {
+                    const classification = results.multiHandedness[index];
+                    const isRightHand = classification.label === 'Right';
+                    const landmarks = results.multiHandLandmarks[index];
+                    drawConnectors(
+                            canvasCVOutCtx, landmarks, HAND_CONNECTIONS,
+                            {color: isRightHand ? '#00FF00' : '#FF0000'})
+                    if (!isRightHand) {
+                        drawLandmarks(canvasCVOutCtx, landmarks, {
+                            color: isRightHand ? '#00FF00' : '#FF0000',
+                            fillColor: isRightHand ? '#FF0000' : '#00FF00',
+                            radius: (x) => {
+                                return lerp(x.from.z, -0.15, .1, 10, 1);
+                                }
+                            });
+                    }
+                }
+            }
             // draw trial stats
             canvasCVOutCtx.font = "24px Georgia";
             canvasCVOutCtx.fillStyle = "fuchsia";
