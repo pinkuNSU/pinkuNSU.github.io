@@ -1,6 +1,6 @@
 import {TechniqueType} from "./constant.js";
 
-class S2HAbsolute {
+export class S2HAbsolute {
     constructor(parent, state) {
         this.name = "S2H_Absolute";
         this.parent = parent;
@@ -35,7 +35,16 @@ class S2HAbsolute {
         this.parent._drawTextMarked(state);
         this.parent._drawProgressBar(state);
     }
+
+    adjustSelection(state) {
+        state.selection.adjustSelection();
+    }
+
+    markSelected(state) {
+        this.parent._markSelected(state);
+    }
+
+    lastTargetVisitTime(p) {
+        return this.parent._lastTargetVisitTime(p);
+    }
 }
-
-
-export {S2HAbsolute};

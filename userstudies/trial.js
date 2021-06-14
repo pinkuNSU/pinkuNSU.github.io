@@ -2,7 +2,7 @@
 import {TrialState, TrialBtnState} from './constant.js';
 import { TechniqueType } from '../technique/constant.js';
 
-class Trial {
+export class Trial {
     constructor(state) {
         this.status         = TrialState.OPEN;
         this.visitTimeBtn   = performance.now();
@@ -70,7 +70,7 @@ class Trial {
     updateTargetLastVisitTime(state) {
         const p = this.targetSeq[this.targetID];
         this.stats.targetsLastVisitedTime[this.targetID] =
-            state.technique.stats.lastVisitTime[p.row_i][p.col_j] -
+            state.technique.anchor.lastTargetVisitTime(p) -
                 this.targetsStartTime[this.targetID];
     }
 
@@ -202,8 +202,31 @@ class Trial {
         this.cursorOverBackBtn = false;
         return false;
     }
-
     updateBackBtnInputLoc(state) {
+        if (state.technique.type == TechniqueType.Landmark_Btn || state.technique.type == TechniqueType.Landmark_Btn_FishEye) {
+            this._updateBackBtnInputLocBtnID(state);
+        } else {
+            this._updateBackBtnInputLoc(state);
+        }
+    }
+
+    _updateBackBtnInputLocBtnID(state) {
+        const p = state.initiator.left.landmarks[4];
+        
+        const tl = new cv.Point(
+            p.x - state.config.landmarkButtons.widthHalf - 70,
+            p.y - state.config.landmarkButtons.heightHalf - 45,
+        );
+
+        const br = new cv.Point(
+            p.x + state.config.landmarkButtons.widthHalf + 70,
+            p.y + state.config.landmarkButtons.heightHalf + 45,
+        );
+
+        this.backBtn.rect = new cv.Rect(tl.x, tl.y, br.x-tl.x, br.y-tl.y);
+    }
+
+    _updateBackBtnInputLoc(state) {
         
         let tl = new cv.Point(
             state.technique.grid.input.x_cols[0] + state.technique.grid.input.width + 10,
@@ -231,6 +254,31 @@ class Trial {
     }
 
     updateStartBtnInputLoc(state) {
+        if (state.technique.type == TechniqueType.Landmark_Btn || state.technique.type == TechniqueType.Landmark_Btn_FishEye) {
+            this._updateStartBtnInputLocBtnID(state);
+        } else {
+            this._updateStartBtnInputLoc(state);
+        }
+    }
+
+    _updateStartBtnInputLocBtnID(state) {
+        
+        const p = state.initiator.left.landmarks[4];
+        
+        const tl = new cv.Point(
+            p.x - state.config.landmarkButtons.widthHalf - 45,
+            p.y - state.config.landmarkButtons.heightHalf - 50,
+        );
+
+        const br = new cv.Point(
+            p.x + state.config.landmarkButtons.widthHalf + 45,
+            p.y + state.config.landmarkButtons.heightHalf + 50,
+        );
+
+        this.startBtn.rect = new cv.Rect(tl.x, tl.y, br.x-tl.x, br.y-tl.y);
+    }
+
+    _updateStartBtnInputLoc(state) {
         
         let tl = new cv.Point(
             state.technique.grid.input.x_cols[0] + state.technique.grid.input.width + 10,
@@ -260,26 +308,16 @@ class Trial {
     drawBackBtn(state) {
         if (this.status == TrialState.DONE) {
 
-            let tl = new cv.Point(
-                state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10,
-                state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 - 45
-            );
-    
-            let br = new cv.Point(
-                state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10 + 120,
-                state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 + 45
-            );
-    
-            if (state.technique.type == TechniqueType.H2S_Absolute) {
-                tl = new cv.Point(
-                    state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10,
-                    state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 - 45
-                );
-    
-                br = new cv.Point(
-                    state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10 + 120,
-                    state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 + 45    
-                );
+            let tl = null, br = null;
+
+            if (state.technique.type == TechniqueType.Landmark_Btn || state.technique.type == TechniqueType.Landmark_Btn_FishEye) {
+                const p = this._drawBackBtnBtnID(state);
+                tl = p.tl;
+                br = p.br;
+            } else {
+                const p = this._drawBackBtn(state);
+                tl = p.tl;
+                br = p.br;
             }
 
             cv.rectangle(
@@ -301,11 +339,24 @@ class Trial {
             );
         }
     }
-    
-    drawStartBtn(state) {
-        if (this.status == TrialState.DONE) {
-            return;
-        }
+
+    _drawBackBtnBtnID(state) {
+        const p = state.initiator.left.landmarks[4];
+        
+        const tl = new cv.Point(
+            p.x - state.config.landmarkButtons.widthHalf - 45,
+            p.y - state.config.landmarkButtons.heightHalf - 60,
+        );
+
+        const br = new cv.Point(
+            p.x + state.config.landmarkButtons.widthHalf + 45,
+            p.y + state.config.landmarkButtons.heightHalf + 60,
+        );
+
+        return {tl, br};
+    }
+
+    _drawBackBtn(state) {
 
         let tl = new cv.Point(
             state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10,
@@ -313,7 +364,7 @@ class Trial {
         );
 
         let br = new cv.Point(
-            state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10 + 90,
+            state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10 + 120,
             state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 + 45
         );
 
@@ -324,11 +375,29 @@ class Trial {
             );
 
             br = new cv.Point(
-                state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10 + 90,
+                state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10 + 120,
                 state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 + 45    
             );
         }
 
+        return {tl, br};
+    }
+    
+    drawStartBtn(state) {
+        if (this.status == TrialState.DONE) {
+            return;
+        }
+
+        let tl = null, br = null;
+        if (state.technique.type == TechniqueType.Landmark_Btn || state.technique.type == TechniqueType.Landmark_Btn_FishEye) {
+            const p = this._drawStartBtnBtnID(state);
+            tl = p.tl;
+            br = p.br;
+        } else {
+            const p = this._drawStartBtn(state);
+            tl = p.tl;
+            br = p.br;
+        }
 
         // if (this.status == TrialState.STARTED) {
         //     this.startBtn.color = new cv.Scalar(220, 248, 255);
@@ -356,6 +425,52 @@ class Trial {
                 );
 
             }
+    }
+
+    _drawStartBtnBtnID(state) {
+        const p = state.initiator.left.landmarks[4];
+        
+        const tl = new cv.Point(
+            p.x - state.config.landmarkButtons.widthHalf - 45,
+            p.y - state.config.landmarkButtons.heightHalf - 45,
+        );
+
+        const br = new cv.Point(
+            p.x + state.config.landmarkButtons.widthHalf + 45,
+            p.y + state.config.landmarkButtons.heightHalf + 45,
+        );
+
+        return {tl, br};
+    }
+
+
+    _drawStartBtn(state) {
+        
+
+        let tl = new cv.Point(
+            state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10,
+            state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 - 45
+        );
+
+        let br = new cv.Point(
+            state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10 + 90,
+            state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 + 45
+        );
+
+        if (state.technique.type == TechniqueType.H2S_Absolute) {
+            tl = new cv.Point(
+                state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10,
+                state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 - 45
+            );
+
+            br = new cv.Point(
+                state.technique.grid.output.x_cols[0] + state.technique.grid.output.width + 10 + 90,
+                state.technique.grid.output.y_rows[0] + state.technique.grid.output.height/2 + 45    
+            );
+        }
+
+
+        return {tl, br};
     }
 
     drawCompletedTargetsText(state) {
@@ -389,18 +504,48 @@ class Trial {
             this.status = TrialState.DONE;
         }
 
+        if (state.technique.type == TechniqueType.Landmark_Btn || state.technique.type == TechniqueType.Landmark_Btn_FishEye) {
+            this.targetSeq[this.targetID] = this._generateTargetBtnID(state);
+        } else {
+            this.targetSeq[this.targetID] = this._generateTarget(state);
+        }
+    }
+    
+    _generateTargetBtnID(state) {
+        let btn_id = 1 + Math.floor(Math.random()*state.config.landmarkButtons.total);
+    
+        while (state.prev_marked_btn_id == btn_id) {
+            btn_id = 1 + Math.floor(Math.random()*state.config.landmarkButtons.total);        
+        }
+        
+        return {btn_id};
+    }
+
+    _generateTarget(state) {
         let row_i = 1 + Math.floor(Math.random()*state.menu.cellscnt);
         let col_j = 1 + Math.floor(Math.random()*state.menu.cellscnt);
-
+    
         while (state.prev_marked_i == row_i && state.prev_marked_j == col_j) {
             row_i = 1 + Math.floor(Math.random()*state.menu.cellscnt);
             col_j = 1 + Math.floor(Math.random()*state.menu.cellscnt);        
         }
-
-        this.targetSeq[this.targetID] = {row_i, col_j};
+        
+        return {row_i, col_j};
     }
 
     matched(state) {        
+        if (state.technique.type == TechniqueType.Landmark_Btn || state.technique.type == TechniqueType.Landmark_Btn_FishEye) {
+            return this._matchedBtnID(state);
+        } else {
+            return this._matched(state);
+        }
+    }
+
+    _matchedBtnID(state) {
+        return state.selection.currentBtn.btn_id == this.targetSeq[this.targetID].btn_id;
+    }
+
+    _matched(state) {        
         return (
             state.selection.currentBtn.row_i == this.targetSeq[this.targetID].row_i &&
             state.selection.currentBtn.col_j == this.targetSeq[this.targetID].col_j
@@ -421,22 +566,46 @@ class Trial {
         }
 
         if (this.status == TrialState.STARTED) {
-            
-            cv.rectangle(
-                state.overlay,
-                new cv.Point(
-                    state.technique.grid.output.x_cols[this.targetSeq[this.targetID].col_j],
-                    state.technique.grid.output.y_rows[this.targetSeq[this.targetID].row_i]
-                ),
-                new cv.Point(
-                    state.technique.grid.output.x_cols[this.targetSeq[this.targetID].col_j+1] - state.technique.grid.output.gap,
-                    state.technique.grid.output.y_rows[this.targetSeq[this.targetID].row_i+1] - state.technique.grid.output.gap    
-                ),
-                new cv.Scalar(128, 0, 128),
-                -1
-            );
+            if (state.technique.type == TechniqueType.Landmark_Btn || state.technique.type == TechniqueType.Landmark_Btn_FishEye) {
+                this._drawTargetBtnID(state);
+            } else {
+                this._drawTarget(state);
+            }
         }
     }
-}
 
-export {Trial};
+    _drawTargetBtnID(state) {
+        const p = state.initiator.left.landmarks[this.targetSeq[this.targetID].btn_id];
+        
+        cv.rectangle(
+            state.overlay,
+            new cv.Point(
+                p.x - state.config.landmarkButtons.widthHalf,
+                p.y - state.config.landmarkButtons.heightHalf
+            ),
+            new cv.Point(
+                p.x + state.config.landmarkButtons.widthHalf,
+                p.y + state.config.landmarkButtons.heightHalf
+            ),
+            new cv.Scalar(128, 0, 128),
+            -1
+        );
+    }
+
+    _drawTarget(state) {
+            
+        cv.rectangle(
+            state.overlay,
+            new cv.Point(
+                state.technique.grid.output.x_cols[this.targetSeq[this.targetID].col_j],
+                state.technique.grid.output.y_rows[this.targetSeq[this.targetID].row_i]
+            ),
+            new cv.Point(
+                state.technique.grid.output.x_cols[this.targetSeq[this.targetID].col_j+1] - state.technique.grid.output.gap,
+                state.technique.grid.output.y_rows[this.targetSeq[this.targetID].row_i+1] - state.technique.grid.output.gap    
+            ),
+            new cv.Scalar(128, 0, 128),
+            -1
+        );
+    }
+}

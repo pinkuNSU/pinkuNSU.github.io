@@ -1,6 +1,6 @@
 import {TechniqueType} from "./constant.js";
 
-class H2SRelativeFinger {
+export class H2SRelativeFinger {
     constructor(parent, state) {
         this.name = "H2S_Relative_Finger";
         this.parent = parent;
@@ -39,9 +39,9 @@ class H2SRelativeFinger {
                 this.parent._setupPalmImageTopLeft(state);
 
                 this.parent.grid.input.x    = this.parent.images.palm.topleft.x + this.parent.images.palm.image.cols/5;
-                this.parent.grid.input.y    = this.parent.images.palm.topleft.y + this.parent.images.palm.image.rows/2;
+                this.parent.grid.input.y    = this.parent.images.palm.topleft.y + this.parent.images.palm.image.rows/10;
                 this.parent.grid.output.x   = this.parent.images.palm.topleft.x + this.parent.images.palm.image.cols/5;
-                this.parent.grid.output.y   = this.parent.images.palm.topleft.y + this.parent.images.palm.image.rows/2;
+                this.parent.grid.output.y   = this.parent.images.palm.topleft.y + this.parent.images.palm.image.rows/10;
                 
                 this.parent.grid.input.align(state);
                 this.parent.grid.output.align(state);
@@ -76,7 +76,16 @@ class H2SRelativeFinger {
         this.parent._drawTextMarked(state);
         this.parent._drawProgressBar(state);
     }
+
+    adjustSelection(state) {
+        state.selection.adjustSelection();
+    }
+
+    markSelected(state) {
+        this.parent._markSelected(state);
+    }
+
+    lastTargetVisitTime(p) {
+        return this.parent._lastTargetVisitTime(p);
+    }
 }
-
-
-export {H2SRelativeFinger};

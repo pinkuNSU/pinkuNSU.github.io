@@ -1,6 +1,6 @@
 import {TechniqueType} from "./constant.js";
 
-class H2SRelative {
+export class H2SRelative {
     constructor(parent, state) {
         this.name = "H2S_Relative";
         this.parent = parent;
@@ -75,7 +75,16 @@ class H2SRelative {
         this.parent._drawTextMarked(state);
         this.parent._drawProgressBar(state);
     }
+
+    adjustSelection(state) {
+        state.selection.adjustSelection();
+    }
+
+    markSelected(state) {
+        this.parent._markSelected(state);
+    }
+
+    lastTargetVisitTime(p) {
+        return this.parent._lastTargetVisitTime(p);
+    }
 }
-
-
-export {H2SRelative};

@@ -21,6 +21,14 @@ class Config {
                 SUMMAX2NEIGHBOR: 16
             }
         };
+
+        this.landmarkButtons = {
+            total: 17,
+            width: 30,
+            height: 30,
+            widthHalf: 15,
+            heightHalf: 15,
+        }
     };
 }
 

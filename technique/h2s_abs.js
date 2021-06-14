@@ -1,6 +1,6 @@
 import {TechniqueType} from "./constant.js";
 
-class H2SAbsolute {
+export class H2SAbsolute {
     constructor(parent, state) {
         this.name = "H2S_Absolute";
         this.parent = parent;
@@ -84,7 +84,16 @@ class H2SAbsolute {
         
         return false;
     }
+
+    adjustSelection(state) {
+        state.selection.adjustSelection();
+    }
+
+    markSelected(state) {
+        this.parent._markSelected(state);
+    }
+
+    lastTargetVisitTime(p) {
+        return this.parent._lastTargetVisitTime(p);
+    }
 }
-
-
-export {H2SAbsolute};

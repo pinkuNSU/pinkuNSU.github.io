@@ -145,11 +145,6 @@ class State {
 }
 
 
-function getState() {
-    return new State();
-}
-
-
 function checkRadio(tag) {
     const radios = document.getElementsByName(tag);
     for (let i = 0, length = radios.length; i < length; i++) {
@@ -166,4 +161,4 @@ function checkSelectList(tag) {
 }
 
 
-export { getState, checkRadio, checkSelectList };
+export { State, checkRadio, checkSelectList };

@@ -4,7 +4,7 @@ import {TRIGGER} from './triggerstate.js';
 import {Dwell} from './dwell.js';
 import {Tap} from './tap.js';
 
-class Trigger {
+export class Trigger {
     constructor(state) {
         this.status = TRIGGER.OPEN;
         this.name = state.menu.trigger;
@@ -24,6 +24,3 @@ class Trigger {
         this.trigger.reset();
     }
 }
-
-
-export {Trigger};

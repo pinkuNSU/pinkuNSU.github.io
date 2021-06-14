@@ -1,14 +1,16 @@
-import {S2HRelative}     from './s2h_rel.js';
-import {S2HAbsolute}     from './s2h_abs.js';
-import {H2SRelative}     from './h2s_rel.js';
-import {MidAir}          from './midair.js';
-import {FishEye}         from './fisheye.js';
-import {Grid}            from '../ds/grid.js';
-import { TechniqueType } from './constant.js';
-import { H2SAbsolute }   from './h2s_abs.js';
-import {GridFishEye}     from '../ds/gridfisheye.js';
-import {S2HRelativeFinger}     from './s2h_rel_finger.js';
-import {H2SRelativeFinger}     from './h2s_rel_finger.js';
+import {S2HRelative}            from './s2h_rel.js';
+import {S2HAbsolute}            from './s2h_abs.js';
+import {H2SRelative}            from './h2s_rel.js';
+import {MidAir}                 from './midair.js';
+import {FishEye}                from './fisheye.js';
+import {Grid}                   from '../ds/grid.js';
+import { TechniqueType }        from './constant.js';
+import { H2SAbsolute }          from './h2s_abs.js';
+import {GridFishEye}            from '../ds/gridfisheye.js';
+import {S2HRelativeFinger}      from './s2h_rel_finger.js';
+import {H2SRelativeFinger}      from './h2s_rel_finger.js';
+import {LandmarkBtn}            from './landmark_btn.js';
+import {LandmarkBtnFishEye}     from './landmark_btn_fisheye.js';
 
 
 class Technique {
@@ -31,7 +33,8 @@ class Technique {
 
         this.stats = {
             visitedCells: 0,
-            lastVisitTime: [...Array(11)].map(e => Array(11))
+            lastVisitTime: [...Array(11)].map(e => Array(11)),
+            lastVisitTimeByID: [...Array(11)].map(e => Array(11))
         };
 
         this.images = {
@@ -75,6 +78,12 @@ class Technique {
             case "H2S_Relative_Finger":
                 this.anchor = new H2SRelativeFinger(this, state);
                 break;
+            case "Landmark_Btn":
+                this.anchor = new LandmarkBtn(this, state);
+                break;
+            case "Landmark_Btn_FishEye":
+                this.anchor = new LandmarkBtnFishEye(this, state);
+                break;
             default:
                 break;
         }
@@ -89,8 +98,12 @@ class Technique {
     }
 
     reset() {
-        this.grid.input.reset();
-        this.grid.output.reset();
+        if (this.type == TechniqueType.Landmark_Btn || state.technique.type == TechniqueType.Landmark_Btn_FishEye) {
+            console.log("landmark btn technique reset");
+        } else {
+            this.grid.input.reset();
+            this.grid.output.reset();
+        }
     }
 
     resetLastTimeVisited() {
@@ -100,6 +113,22 @@ class Technique {
                 this.stats.lastVisitTime[i][j] = t;
             }
         }
+    }
+
+    isCursorInside(state) {
+        if (this.type == TechniqueType.Landmark_Btn || state.technique.type == TechniqueType.Landmark_Btn_FishEye) {
+            return this._isCursorInsideBtnID(state);
+        }
+
+        return this._isCursorInside(state);
+    }
+
+    _isCursorInside(state) {
+        return this.grid.input.isCursorInside(state);
+    }
+
+    _isCursorInsideBtnID(state) {
+        return this.anchor.isCursorInside(state);
     }
 
     _setupPalmActiveZone(state) {
@@ -121,11 +150,12 @@ class Technique {
     }
 
     _setupPalmImageTopLeft(state) {
-        const g = this.grid.input.getBottomMiddle();
+        // const g = this.grid.input.getBottomMiddle();
+        const g = state.initiator.left.landmarks[0];
         
         if (g.x != -1 && g.y != -1) {
             this.images.palm.topleft.x = g.x - this.images.palm.image.cols/2;
-            this.images.palm.topleft.y = g.y - this.images.palm.image.rows;
+            this.images.palm.topleft.y = g.y - this.images.palm.image.rows + this.images.palm.image.rows/4;
             
             if (this.images.palm.topleft.x < 0) this.images.palm.topleft.x = 0;
             if (this.images.palm.topleft.y < 0) this.images.palm.topleft.y = 0;
@@ -167,18 +197,37 @@ class Technique {
         );
     }
 
-    _setupSelection(state) {
+    _setupSelectionLandmarks(state) {
+        state.selection.previousBtn.btn_id = state.selection.currentBtn.btn_id;
 
         if (state.selection.locked) return;
+
+        const btnID = this.anchor.btnIDPointedBy(state);
+
+        if (btnID != -1) {
+            if (btnID != state.selection.previousBtn.btn_id) {
+                
+                this.stats.lastVisitTimeByID[btnID] = performance.now();
+                state.selection.messages.selected = 
+                    `Highlighted: ${btnID}`;
+                this.stats.visitedCells ++;
+            }
+            
+            state.selection.currentBtn.btn_id = btnID;
+
+            state.selection.addToPastSelectionsBtnID(btnID);
+        }
+
+    }
+
+    _setupSelection(state) {
 
         state.selection.previousBtn.row_i = 
             state.selection.currentBtn.row_i;
         state.selection.previousBtn.col_j = 
             state.selection.currentBtn.col_j;
-
-        if (state.selection.locked) {
-            return;
-        }
+        
+        if (state.selection.locked) return;
         
         const btn = this.grid.input.btnPointedBy(state.cursor);
 
@@ -248,26 +297,15 @@ class Technique {
                 );
             }
         }
-
-        // if (state.selection.currentBtn.row_i != -1 &&
-        //     state.selection.currentBtn.col_j != -1) {
-
-        //     let c = new cv.Scalar(25, 25, 255);
-        //     cv.rectangle(
-        //         state.overlay,
-        //         new cv.Point(
-        //             this.grid.output.x_cols[state.selection.currentBtn.col_j], 
-        //             this.grid.output.y_rows[state.selection.currentBtn.row_i]),
-        //         new cv.Point(
-        //             this.grid.output.x_cols[state.selection.currentBtn.col_j]+this.grid.output.dx_col, 
-        //             this.grid.output.y_rows[state.selection.currentBtn.row_i] + this.grid.output.dy_row),
-        //         c,
-        //         -1
-        //     );
-        // }
     }
 
-    markSelected(state) {
+    _markSelectedBtnID(state) {
+        state.selection.markedBtn.btn_id = state.selection.currentBtn.btn_id;
+        if (state.selection.markedBtn.btn_id == -1) return;
+        state.selection.messages.marked = `Marked: ${state.selection.currentBtn.btn_id + 1}`;
+    }
+
+    _markSelected(state) {
         state.selection.markedBtn.row_i = state.selection.currentBtn.row_i;
         state.selection.markedBtn.col_j = state.selection.currentBtn.col_j;
         
@@ -275,7 +313,15 @@ class Technique {
             state.selection.markedBtn.col_j > 0) {
                 state.selection.messages.marked = `Marked: ${(state.selection.currentBtn.row_i-1)*this.grid.input.divisions + state.selection.currentBtn.col_j}`;
             }
-    }        
+    }      
+
+    _lastTargetVisitTimeBtnID(p) {
+        return this.stats.lastVisitTimeByID[p.btn_id];
+    }
+    
+    _lastTargetVisitTime(p) {
+        return this.stats.lastVisitTime[p.row_i][p.col_j];
+    }
     
     _drawTextHighlighted(state) {
         if (state.selection.currentBtn.row_i != -1 &&

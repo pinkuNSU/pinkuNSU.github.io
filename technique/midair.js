@@ -1,6 +1,6 @@
 import { TechniqueType } from "./constant.js";
 
-class MidAir {
+export class MidAir {
     constructor(parent, state) {
         this.parent = parent;
         this.parent.type = TechniqueType.MidAir;
@@ -35,6 +35,16 @@ class MidAir {
         this.parent._drawTextMarked(state);
         this.parent._drawProgressBar(state);
     }
-}
 
-export { MidAir };
+    adjustSelection(state) {
+        state.selection.adjustSelection();
+    }
+
+    markSelected(state) {
+        this.parent._markSelected(state);
+    }
+
+    lastTargetVisitTime(p) {
+        return this.parent._lastTargetVisitTime(p);
+    }
+}

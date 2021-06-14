@@ -2,6 +2,7 @@ class Button {
     constructor() {
         this.row_i = -1;
         this.col_j = -1;
+        this.btn_id = -1;
     }
 }
 
@@ -47,6 +48,12 @@ class ButtonSelection {
             this.currentBtn.col_j = this.pastSelections.head.col_j;
         }
     }
+    
+    adjustSelectionBtnID() {
+        if (this.pastSelections.head != null) {
+            this.currentBtn.btn_id = this.pastSelections.head.btn_id;
+        }
+    }
 
     addToPastSelections(btn) {
         if (this.pastSelections.tail == null) {
@@ -59,6 +66,24 @@ class ButtonSelection {
             this.pastSelections.tail = this.pastSelections.tail.next;
             this.pastSelections.tail.row_i = btn.row_i;
             this.pastSelections.tail.col_j = btn.col_j;
+
+            this.pastSelections.cnt ++;
+            if (this.pastSelections.cnt > 3) {
+                this.pastSelections.head = this.pastSelections.head.next;
+                this.pastSelections.cnt = 3;
+            }
+        }
+    }
+
+    addToPastSelectionsBtnID(btnID) {
+        if (this.pastSelections.tail == null) {
+            this.pastSelections.tail = new Button();
+            this.pastSelections.tail.btn_id = btnID;
+            this.pastSelections.head = this.pastSelections.tail;
+        } else {
+            this.pastSelections.tail.next = new Button();
+            this.pastSelections.tail = this.pastSelections.tail.next;
+            this.pastSelections.tail.btn_id = btnID;
 
             this.pastSelections.cnt ++;
             if (this.pastSelections.cnt > 3) {

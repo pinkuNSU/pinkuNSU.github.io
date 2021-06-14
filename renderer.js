@@ -1,6 +1,6 @@
 "use strict";
 
-import {checkRadio, checkSelectList, getState} from './state.js';
+import {checkRadio, checkSelectList, State} from './state.js';
 import {Initiator} from './initiator.js';
 import { Technique } from './technique/technique.js';
 import {Trigger} from './trigger/trigger.js';
@@ -42,7 +42,7 @@ window.onload = function() {
     //         function () { logError("Web cam is not accessible."); });
     // }
 
-    let state = getState();
+    let state = new State();
 
 
     state.experiment = {
@@ -99,8 +99,33 @@ window.onload = function() {
         state.menu.debug        = document.getElementById("debugCheck").checked;
         state.menu.cellscnt     = parseInt(checkSelectList("selectCells"));
         state.menu.targetscnt   = 12;
+        state.menu.buttonSize   = checkRadio("buttonSize");
         state.height            = state.config.CAMHEIGHT; 
         state.width             = state.config.CAMWIDTH;
+
+        switch (state.menu.buttonSize) {
+            case "Small":
+                state.config.landmarkButtons.width = 30;
+                state.config.landmarkButtons.height = 30;
+                state.config.landmarkButtons.widthHalf = 15;
+                state.config.landmarkButtons.heightHalf = 15;
+                break;
+
+            case "Large":
+                console.log("Large");
+                state.config.landmarkButtons.width = 50;
+                state.config.landmarkButtons.height = 50;
+                state.config.landmarkButtons.widthHalf = 25;
+                state.config.landmarkButtons.heightHalf = 25;
+                break;
+
+            default:
+                state.config.landmarkButtons.width = 30;
+                state.config.landmarkButtons.height = 30;
+                state.config.landmarkButtons.widthHalf = 15;
+                state.config.landmarkButtons.heightHalf = 15;
+
+        }
 
         menu.style.display = "none";
         videoContainer.style.display = "block";
@@ -125,8 +150,8 @@ window.onload = function() {
         hands.setOptions({
             selfieMode: true,
             maxNumHands: 2,
-            minDetectionConfidence: 0.5,
-            minTrackingConfidence: 0.5
+            minDetectionConfidence: 0.7,
+            minTrackingConfidence: 0.7
         });
         
         hands.onResults(onResults);
@@ -173,7 +198,9 @@ window.onload = function() {
         
         
         if (state.technique.type == TechniqueType.H2S_Relative ||
-            state.technique.type == TechniqueType.H2S_Absolute) {
+            state.technique.type == TechniqueType.H2S_Absolute ||
+            state.technique.type == TechniqueType.H2S_Relative_Finger
+            ) {
             state.imageCV = state.technique.images.background.image.clone();            
             state.outputCV = state.technique.images.background.image.clone();
         } else {
@@ -210,7 +237,15 @@ window.onload = function() {
 
             state.trigger.update(state);
 
-            // document.getElementById('stats').innerHTML = state.experiment.trial.targetsDuration;
+            console.log("state.trigger:", state.trigger);
+
+            if (state.trigger.status == TRIGGER.RELEASED)
+                console.log("##after update trigger released");
+            else if (state.trigger.status == TRIGGER.OPEN) {
+                console.log("##after update trigger open");
+
+            }
+
             if (state.trigger.status != TRIGGER.PRESSED) {
                 state.selection.locked = false;
                 state.resetCursorPath();
@@ -218,20 +253,35 @@ window.onload = function() {
 
             let resetAnchor = false;
 
+
+
             switch(state.trigger.status) {
                 case TRIGGER.ONHOLD:
+                    console.log("rendered triggger onhold");
                     break;
                 case TRIGGER.OPEN:
+                    console.log("rendered triggger open");
+
                     break;
                 case TRIGGER.PRESSED:
-                    if (state.technique.grid.input.isCursorInside(state)) {
-                        state.selection.adjustSelection();
+                    console.log("rendered triggger preseed");
+
+                    // if (state.technique.grid.input.isCursorInside(state)) {
+                    if (state.technique.isCursorInside(state)) {
+                        
+                        state.technique.anchor.adjustSelection(state);
+                        
                         state.lockSelection();
                     }
                     state.updateCursorPath();
                     break;
                 case TRIGGER.RELEASED:
+                    console.log("rendered triggger released");
                     state.resetCursorPath();
+                    if (state.experiment.trial.status == TrialState.STARTED) {
+                        console.log("status STARTED");
+                    }
+
                     if (state.experiment.trial.isCursorOverStartBtn(state)) {
                         state.experiment.trial.clickStartBtn(state);
                         state.technique.stats.visitedCells = 0;
@@ -241,7 +291,9 @@ window.onload = function() {
                         goBackToMenu();
                     } else if (state.experiment.trial.status == TrialState.STARTED){
                         
-                        state.technique.markSelected(state);
+                        console.log("STARTED");
+
+                        state.technique.anchor.markSelected(state);
                         state.experiment.trial.incrementAttempts();
                         
                         if (state.experiment.trial.matched(state)) {
@@ -306,18 +358,36 @@ window.onload = function() {
         cv.imshow('cv_output_canvas', state.outputCV);
 
         if (state.initiator.left.show &&
-            state.selection.currentBtn.row_i != -1 &&
-            state.selection.currentBtn.col_j != -1) {
+                (
+                    (
+                        state.selection.currentBtn.row_i != -1 &&
+                        state.selection.currentBtn.col_j != -1
+                    ) 
+                    || state.selection.currentBtn.btn_id != -1
+                )
+            ) {
             
                 canvasCVOutCtx.strokeStyle = "blue";
                 canvasCVOutCtx.lineWidth = 3;
                 canvasCVOutCtx.globalAlpha = 0.4;
-                canvasCVOutCtx.strokeRect(
-                    state.technique.grid.output.x_cols[state.selection.currentBtn.col_j], 
-                    state.technique.grid.output.y_rows[state.selection.currentBtn.row_i], 
-                    state.technique.grid.output.x_cols[state.selection.currentBtn.col_j+1] - state.technique.grid.output.x_cols[state.selection.currentBtn.col_j], 
-                    state.technique.grid.output.y_rows[state.selection.currentBtn.row_i+1] - state.technique.grid.output.y_rows[state.selection.currentBtn.row_i]
-                );                
+
+                console.table(state.selection.currentBtn);
+
+                if (state.technique.type == TechniqueType.Landmark_Btn || state.technique.type == TechniqueType.Landmark_Btn_FishEye) {
+                    canvasCVOutCtx.strokeRect(
+                        state.initiator.left.landmarks[state.selection.currentBtn.btn_id].x - state.technique.buttons.output[state.selection.currentBtn.btn_id].widthHalf,
+                        state.initiator.left.landmarks[state.selection.currentBtn.btn_id].y - state.technique.buttons.output[state.selection.currentBtn.btn_id].heightHalf,
+                        state.technique.buttons.output[state.selection.currentBtn.btn_id].width,
+                        state.technique.buttons.output[state.selection.currentBtn.btn_id].height,
+                    );
+                } else {
+                    canvasCVOutCtx.strokeRect(
+                        state.technique.grid.output.x_cols[state.selection.currentBtn.col_j], 
+                        state.technique.grid.output.y_rows[state.selection.currentBtn.row_i], 
+                        state.technique.grid.output.x_cols[state.selection.currentBtn.col_j+1] - state.technique.grid.output.x_cols[state.selection.currentBtn.col_j], 
+                        state.technique.grid.output.y_rows[state.selection.currentBtn.row_i+1] - state.technique.grid.output.y_rows[state.selection.currentBtn.row_i]
+                    );                
+                }
         }
 
         if (state.cursorPath.head != null) {
@@ -357,7 +427,7 @@ window.onload = function() {
 
         if (state.menu.debug) {
 
-            console.log("results.multiHandLandmarks:", results.multiHandLandmarks);
+            // console.log("results.multiHandLandmarks:", results.multiHandLandmarks);
             if (results.multiHandLandmarks) {
                 for (let index = 0; index < results.multiHandLandmarks.length; index++) {
                     const classification = results.multiHandedness[index];

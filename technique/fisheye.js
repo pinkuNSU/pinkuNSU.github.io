@@ -1,6 +1,6 @@
 import {TechniqueType} from "./constant.js";
 
-class FishEye {
+export class FishEye {
     constructor(parent, state) {
         this.name = "FishEye";
         this.parent = parent;
@@ -47,7 +47,17 @@ class FishEye {
         this.parent._drawTextMarked(state);
         this.parent._drawProgressBar(state);
     }
+
+    adjustSelection(state) {
+        state.selection.adjustSelection();
+    }
+
+    markSelected(state) {
+        this.parent._markSelected(state);
+    }
+
+    lastTargetVisitTime(p) {
+        return this.parent._lastTargetVisitTime(p);
+    }
+    
 }
-
-
-export {FishEye};
