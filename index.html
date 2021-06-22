@@ -26,6 +26,8 @@
 
       <script async src="./lib/opencv.js" onload="onOpenCvReady()" type="text/javascript"></script>
       
+      <!-- todo add favicon -->
+      <link rel="shortcut icon" href="#">
       <title>PalmSpace</title>
   </head>
 
@@ -61,20 +63,36 @@
                 </label>
               </div>
             </div>
-            
 
+            
             <div class="form-group">
-              <label class="mr-sm-2" for="selectCells">Number of cells per row/col</label>
-              <select class="custom-select mr-sm-2" id="selectCells">
+              <label class="mr-sm-2" for="selectCellsRow">Number of cells per row</label>
+              <select class="custom-select mr-sm-2" id="selectCellsRow">
                 <option value="2">2</option>
                 <option value="3">3</option>
                 <option value="4" selected>4</option>
                 <option value="6">6</option>
               </select>
             </div>
+            <div class="form-group">
+              <label class="mr-sm-2" for="selectCellsCol">Number of cells per col</label>
+              <select class="custom-select mr-sm-2" id="selectCellsCol">
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="6">6</option>
+              </select>
+            </div>
 
             <div class="row">
               <h2>Button Size</h2>
+
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="buttonSize" id="buttonSize_dynamic" value="Dynamic">
+                <label class="form-check-label" for="buttonSize_dynamic">
+                  Dynamic
+                </label>
+              </div>
 
               <div class="form-check">
                 <input class="form-check-input" type="radio" name="buttonSize" id="buttonSize_small" value="Small">
@@ -84,10 +102,35 @@
               </div>
               
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="buttonSize" id="buttonSize_large" value="Large" checked>
+                <input class="form-check-input" type="radio" name="buttonSize" id="buttonSize_large" value="Large">
                 <label class="form-check-label" for="buttonSize_large">
                   Large
                 </label>
+              </div>
+
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="buttonSize" id="buttonSize_custom" value="Custom" checked onchange="showBtnSizeInput();">
+                <label class="form-check-label" for="buttonSize_large">
+                  Custom
+                </label>
+              </div>
+
+              <div classs = "row" id = "size_input">
+                <div class="form-group row">
+                  <label for="cell_width" class="col-sm-2 col-form-label">Width</label>
+                  <div class="col-sm-3">
+                    <input type="text" class="form-control" id="cell_width" placeholder="Cell width in pixels" value = 30 style="width: 7em;">
+                  </div>
+                  <label for="cell_height" class="col-sm-2 col-form-label">pixels</label>
+                </div>
+
+                <div class="form-group row">
+                  <label for="cell_height" class="col-sm-2 col-form-label">Height</label>
+                  <div class="col-sm-3">
+                    <input type="text" class="form-control" id="cell_height" placeholder="Cell height in pixels" value = 60 style="width: 7em;">
+                  </div>
+                  <label for="cell_height" class="col-sm-2 col-form-label">pixels</label>
+                </div>
               </div>
             </div>
 <!-- 
@@ -113,7 +156,7 @@
               </div>
               
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="menutechnique" id="menutechnique_h2s_rel" value="H2S_Relative">
+                <input class="form-check-input" type="radio" name="menutechnique" id="menutechnique_h2s_rel" value="H2S_Relative" checked>
                 <label class="form-check-label" for="menutechnique_h2s_rel">
                   H2S Relative Palm
                 </label>
@@ -134,14 +177,14 @@
               </div>
               
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="menutechnique" id="menutechnique_landmark_btn" value="Landmark_Btn" checked>
+                <input class="form-check-input" type="radio" name="menutechnique" id="menutechnique_landmark_btn" value="Landmark_Btn">
                 <label class="form-check-label" for="menutechnique_landmark_btn">
                   Landmark Buttons
                 </label>
               </div>
 
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="menutechnique" id="menutechnique_landmark_btn_fisheye" value="Landmark_Btn_FishEye" checked>
+                <input class="form-check-input" type="radio" name="menutechnique" id="menutechnique_landmark_btn_fisheye" value="Landmark_Btn_FishEye">
                 <label class="form-check-label" for="menutechnique_landmark_btn_fisheye">
                   Landmark Buttons FishEye
                 </label>

@@ -1,15 +1,16 @@
 class Config {
     constructor() {
         this.TRANSPARENCY_ALPHA = 0.5;
-        this.DWELLWAIT_MS       = 600;
-        this.CAMWIDTH           = 1280;
-        this.CAMHEIGHT          = 720;
-        this.IMGPALM_DIMMAX     = Math.min(this.CAMHEIGHT, this.CAMWIDTH)/3;
-        this.ABSOLUTEWIDTH      = 350;
+        this.DWELLWAIT_MS = 600;
+        this.CAMWIDTH = 1280;
+        this.CAMHEIGHT = 720;
+        this.IMGPALM_DIMMAX = Math.min(this.CAMHEIGHT, this.CAMWIDTH) / 3;
+        this.ABSOLUTEWIDTH = 350;
         this.progressbar = {
-            MAXWIDTH: this.CAMWIDTH/8,
-            MAXHEIGHT: this.CAMHEIGHT/28
+            MAXWIDTH: this.CAMWIDTH / 8,
+            MAXHEIGHT: this.CAMHEIGHT / 28
         }; // todo use this
+
         this.fisheye = {
             weights: {
                 MAX: 8,
@@ -22,14 +23,27 @@ class Config {
             }
         };
 
+        this.grid = {
+            gap: 3,
+            width: null,
+            height: null
+        };
+
         this.landmarkButtons = {
             total: 17,
             width: 30,
             height: 30,
             widthHalf: 15,
             heightHalf: 15,
-        }
+        };
+
+        // a single button/cell in grid
+        this.buttons = {
+            width: 30,
+            height: 30,
+            isDynamic: false
+        };
     };
 }
 
-export {Config};
+export { Config };

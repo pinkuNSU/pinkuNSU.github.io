@@ -492,12 +492,12 @@ export class Trial {
         this.startBtn.label = 'Next';
         this.targetsStartTime[this.targetID] = performance.now();
     }
-
+    
     generateTarget(state) {
         if (this.status == TrialState.DONE) {
             return;
         }
-
+        
         this.targetID += 1;
         
         if (this.targetID == this.targetSeqSize) {
@@ -522,12 +522,12 @@ export class Trial {
     }
 
     _generateTarget(state) {
-        let row_i = 1 + Math.floor(Math.random()*state.menu.cellscnt);
-        let col_j = 1 + Math.floor(Math.random()*state.menu.cellscnt);
+        let row_i = 1 + Math.floor(Math.random()*state.menu.cellscnt.row);
+        let col_j = 1 + Math.floor(Math.random()*state.menu.cellscnt.col);
     
         while (state.prev_marked_i == row_i && state.prev_marked_j == col_j) {
-            row_i = 1 + Math.floor(Math.random()*state.menu.cellscnt);
-            col_j = 1 + Math.floor(Math.random()*state.menu.cellscnt);        
+            row_i = 1 + Math.floor(Math.random()*state.menu.cellscnt.row);
+            col_j = 1 + Math.floor(Math.random()*state.menu.cellscnt.col);        
         }
         
         return {row_i, col_j};
